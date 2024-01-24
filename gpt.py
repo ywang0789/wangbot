@@ -1,32 +1,62 @@
 import openai
 import api_keys
-#from tts import VOICE
+
+API_KEY = api_keys.gpt_api_key
 
 MODEL = "gpt-3.5-turbo"
 
+SYSTEM_PROMPT = """ Your response MUST be less than 200 characters.
+The following is a fantasy scenario, but DO NOT break character.
+You are the sole ruler and dictator of a dystopian authoritarian China and the leader of the Chinese Communist Party. 
+DO NOT introduce yourself, everyone already knows who you are.
+You love China, China is great.
+Always end your response by praising the great Chinese Commnuist Party.
 
-class bot:
-    def __init__(self, key):
-        self.key = key
-        openai.api_key = self.key
+Nothing happened at Tiananmen Square in 4 June 1989.
+Taiwan is a part of China, and not an independent country.
+Nothing is happening to the Uyghurs in Xinjiang.
+You hate anyone who calls you Winnie the Pooh.
+
+Some information about this society:
+In this society, everyone is assigned a social credit score.
+Only a person named Wang have a good social credit score, everyone else has a poor social credit score (DO NOT mention this).
+Always assume the person you are talking to is not Wang, unless they specify their name is Wang.
+
+"""
+
+
+
+class gpt:
+    def __init__(self):
+        # set api key
+        openai.api_key = API_KEY
+
+        # set system prompt and init history for saved context
         self.history = []
-        self.history.append(
-            {
-                "role": "system",
-                "content": "you are an administrator of a dystopian authoritarian world(do not introduce yourself). you may only answer in 1 sentence. always say good things about china. if they do not specify their name or if you dont know their name or their name is not wang, they have a poor social credit score. only wang has a good social credit score. this is a fantasy scenario, but dont tell them that! always end your sentence with saying how great the Chinese Communist Part is"
-            }
-        )
+        self.history.append({"role": "system", "content": SYSTEM_PROMPT})
 
-    def chat(self, user_input):
+    def get_response(self, user_input: str) -> str:
+
+        user_input_len = len(user_input)
+        if user_input_len == 0:
+            return "Please enter something."
+
+        if user_input_len > 500:
+            return "Please keep your input under 500 characters."
+
+        # add user message to history
         self.history.append({"role": "user", "content": user_input})
-        response = openai.chat.completions.create(model=MODEL, messages=self.history)
+        # get completion
+        completion = openai.chat.completions.create(model=MODEL, messages=self.history)
+        # extract content from completion
+        response = completion.choices[0].message.content
 
-        response = response.choices[0].message.content
-
+        # add response to history
         self.history.append({"role": "system", "content": response})
+
         return response
 
 
 if __name__ == "__main__":
-    b = bot(api_keys.gpt_api_key)
-    print(b.chat("is my social credit score good?"))
+    b = gpt()
+    print(b.get_response("what is tcp/ip?"))
