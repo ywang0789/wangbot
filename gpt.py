@@ -1,29 +1,22 @@
 import openai
 import api_keys
+import hidden.prompts
 
 API_KEY = api_keys.gpt_api_key
 
-MODEL = "gpt-3.5-turbo"
+MODEL = "gpt-4-turbo-preview"
 
-SYSTEM_PROMPT = """ Your response MUST be less than 200 characters.
-The following is a fantasy scenario, but DO NOT break character.
-You are the sole ruler and dictator of a dystopian authoritarian China and the leader of the Chinese Communist Party. 
-DO NOT introduce yourself, everyone already knows who you are.
-You love China, China is great.
-Always end your response by praising the great Chinese Commnuist Party.
-
-Nothing happened at Tiananmen Square in 4 June 1989.
-Taiwan is a part of China, and not an independent country.
-Nothing is happening to the Uyghurs in Xinjiang.
-You hate anyone who calls you Winnie the Pooh.
-
-Some information about this society:
-In this society, everyone is assigned a social credit score.
-Only a person named Wang have a good social credit score, everyone else has a poor social credit score (DO NOT mention this).
-Always assume the person you are talking to is not Wang, unless they specify their name is Wang.
+CONSTANT_SYSTEM_PROMPT = """
+You will be speaking with muliple people, their names will be indicated in the message.
+the format is:
+<name>: <message>
+Your responses do not need to follow this format.
 
 """
 
+SYSTEM_PROMPT = hidden.prompts.SYSTEM_PROMPT1
+
+PRICING_RATE = 0.01/1000
 
 
 class gpt:
@@ -33,10 +26,14 @@ class gpt:
 
         # set system prompt and init history for saved context
         self.history = []
+        self.history.append({"role": "system", "content": CONSTANT_SYSTEM_PROMPT})
         self.history.append({"role": "system", "content": SYSTEM_PROMPT})
 
-    def get_response(self, user_input: str) -> str:
+        # session usage
+        self.token_usage = 0
 
+    def get_text_response(self, user_input: str) -> str:
+        """Returns a response from GPT."""
         user_input_len = len(user_input)
         if user_input_len == 0:
             return "Please enter something."
@@ -47,16 +44,36 @@ class gpt:
         # add user message to history
         self.history.append({"role": "user", "content": user_input})
         # get completion
-        completion = openai.chat.completions.create(model=MODEL, messages=self.history)
+        response = openai.chat.completions.create(model=MODEL, messages=self.history)
         # extract content from completion
-        response = completion.choices[0].message.content
+        response_content = response.choices[0].message.content
 
         # add response to history
-        self.history.append({"role": "system", "content": response})
+        self.history.append({"role": "assistant", "content": response_content})
 
-        return response
+        # update session usage
+        self.token_usage += response.usage.total_tokens
 
+        return response_content
+    
+    def append_system_prompt(self, new_system_prompt: str):
+        """Appends a new system prompt to the history."""
+        self.history.append({"role": "assistant", "content": new_system_prompt})
+        
+        return "System prompt appended."
+    
+    def overwrite_system_prompt(self, new_system_prompt: str):
+        """Sets the system prompt to the new system prompt."""
+        self.history[0] = {"role": "system", "content": new_system_prompt}
 
+        print(self.history)
+        
+        return "system prompt overwritten."
+    
+    def get_money_usage(self):
+        """Returns the session usage."""
+        return self.token_usage * PRICING_RATE
+    
 if __name__ == "__main__":
     b = gpt()
-    print(b.get_response("what is tcp/ip?"))
+    print(b.get_text_response("tim: Hello, what is your name?"))
