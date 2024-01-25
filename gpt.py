@@ -1,3 +1,6 @@
+"""
+For making a gpt chatbot.
+"""
 import openai
 import api_keys
 import hidden.prompts
@@ -5,6 +8,8 @@ import hidden.prompts
 API_KEY = api_keys.gpt_api_key
 
 MODEL = "gpt-4-turbo-preview"
+PRICING_RATE = 0.01/1000  # $0.01 per 1000 tokens, change if change model
+
 
 CONSTANT_SYSTEM_PROMPT = """
 You will be speaking with muliple people, their names will be indicated in the message.
@@ -14,18 +19,19 @@ Your responses do not need to follow this format.
 
 """
 
-SYSTEM_PROMPT = hidden.prompts.SYSTEM_PROMPT1
+SYSTEM_PROMPT = hidden.prompts.SYSTEM_PROMPT1 # hehe ;)
 
-PRICING_RATE = 0.01/1000
 
 
 class gpt:
+    """A class that create a gpt that chats and stuff"""
     def __init__(self):
         # set api key
         openai.api_key = API_KEY
 
-        # set system prompt and init history for saved context
+        # init history for saving context 
         self.history = []
+        # set system prompt to history
         self.history.append({"role": "system", "content": CONSTANT_SYSTEM_PROMPT})
         self.history.append({"role": "system", "content": SYSTEM_PROMPT})
 
@@ -33,7 +39,7 @@ class gpt:
         self.token_usage = 0
 
     def get_text_response(self, user_input: str) -> str:
-        """Returns a response from GPT."""
+        """Returns a response from GPT. Also updates the history."""
         user_input_len = len(user_input)
         if user_input_len == 0:
             return "Please enter something."

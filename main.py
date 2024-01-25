@@ -1,14 +1,18 @@
+""" main file for bot """
 import api_keys
 import discord 
 from discord.ext import commands
 import gpt
 import time
 
+# bot setup
+TOKEN = api_keys.discord_token
 INTENTS = discord.Intents.default()
 INTENTS.messages = True
 INTENTS.message_content=True
 BOT = commands.Bot(command_prefix='!', intents=INTENTS)
 
+# gpt setup
 GPT = gpt.gpt()
 START_TIME = time.time()
 FORMATTED_START_TIME = time.strftime("%a, %d %b %Y %H:%M:%S", time.localtime(START_TIME))
@@ -29,11 +33,6 @@ async def hi_command(ctx):
 async def wangbot_command(ctx, *, message: str):
     message = ctx.author.name + ": " + message
     
-    # get attachments if any
-    if len(ctx.message.attachments) > 0:
-        print(ctx.message.attachments[0].url)
-        message += " " + ctx.message.attachments[0].url
-    print(message)
     await ctx.send(GPT.get_text_response(message))
 
 # !appendwang
@@ -84,5 +83,4 @@ async def on_message(message):
         return
     await BOT.process_commands(message)
 
-TOKEN = api_keys.discord_token
 BOT.run(TOKEN)

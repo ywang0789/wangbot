@@ -1,3 +1,4 @@
+""" This file contains the API keys """
 import json 
 
 with open("hidden/keys.json", "r") as file:
