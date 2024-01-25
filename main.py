@@ -28,7 +28,7 @@ async def on_ready():
 
 
 # !hello
-@BOT.command(name="hi")
+@BOT.command(name="hi", help="Says hi to you.")
 async def hi_command(ctx):
     await ctx.send(f"Hi, {ctx.author.name}!")
 
