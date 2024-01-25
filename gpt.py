@@ -4,6 +4,8 @@ For making a gpt chatbot.
 import openai
 import api_keys
 import hidden.prompts
+import json
+import time
 
 API_KEY = api_keys.gpt_api_key
 
@@ -21,6 +23,7 @@ Your responses do not need to follow this format.
 
 SYSTEM_PROMPT = hidden.prompts.SYSTEM_PROMPT1 # hehe ;)
 
+HISTORY_FILE = "./hidden/history.json"
 
 
 class gpt:
@@ -80,6 +83,17 @@ class gpt:
         """Returns the session usage."""
         return self.token_usage * PRICING_RATE
     
+    def save_history(self):
+        """Saves the history to a json file."""
+        with open(HISTORY_FILE, "w") as file:
+            json.dump(self.history, file)
+
+    def load_history(self):
+        """Loads the history from a json file."""
+        with open(HISTORY_FILE, "r") as file:
+            self.history = json.load(file)
+    
 if __name__ == "__main__":
     b = gpt()
     print(b.get_text_response("tim: Hello, what is your name?"))
+    b.save_history()
