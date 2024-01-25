@@ -23,8 +23,6 @@ Your responses do not need to follow this format.
 
 SYSTEM_PROMPT = hidden.prompts.SYSTEM_PROMPT1 # hehe ;)
 
-HISTORY_FILE = "./hidden/history.json"
-
 
 class gpt:
     """A class that create a gpt that chats and stuff"""
@@ -83,14 +81,14 @@ class gpt:
         """Returns the session usage."""
         return self.token_usage * PRICING_RATE
     
-    def save_history(self):
+    def save_history(self, file_name: str = "history.json"):
         """Saves the history to a json file."""
-        with open(HISTORY_FILE, "w") as file:
+        with open(file_name, "w") as file:
             json.dump(self.history, file)
 
-    def load_history(self):
+    def load_history(self, file_name: str = "history.json"):
         """Loads the history from a json file."""
-        with open(HISTORY_FILE, "r") as file:
+        with open(file_name, "r") as file:
             self.history = json.load(file)
     
 if __name__ == "__main__":
