@@ -18,7 +18,7 @@ START_TIME = time.time()
 FORMATTED_START_TIME = time.strftime(
     "%a, %d %b %Y %H:%M:%S", time.localtime(START_TIME)
 )
-HISTORY_FILE_DIR = "./hidden/"
+HIDDEN_FILE_DIR = "./hidden/"
 
 
 # on start
@@ -30,20 +30,22 @@ async def on_ready():
 # !hello
 @BOT.command(name="hi", help="Says hi to you.")
 async def hi_command(ctx):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !hi.") 
     await ctx.send(f"Hi, {ctx.author.name}!")
 
 
 # !wangbot
 @BOT.command(name="wangbot", help="Talk to Wangbot.")
 async def wangbot_command(ctx, *, message: str):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
     message = ctx.author.name + ": " + message
-
     await ctx.send(GPT.get_text_response(message))
 
 
 # !appendwang
 @BOT.command(name="appendwang", help="Appends a new system prompt.")
 async def appendwang_command(ctx, *, message: str):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !appendwang {message}")
     GPT.append_system_prompt(message)
     await ctx.send("System prompt appened.")
 
@@ -51,19 +53,21 @@ async def appendwang_command(ctx, *, message: str):
 # !overwritewang
 @BOT.command(name="overwritewang", help="Overwrites the system prompt.")
 async def overwritewang_command(ctx, *, message: str):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !overwritewang {message}") 
     GPT.overwrite_system_prompt(message)
     await ctx.send("System prompt overwritten.")
 
 
-# !session
-@BOT.command(name="session", help="Gets info about current session.")
+# !wanginfo
+@BOT.command(name="wanginfo", help="Gets info about current session.")
 async def usage_command(ctx):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wanginfo.") 
     # calculate time elapsed
     time_elapsed = time.time() - START_TIME
     formated_time_elapsed = time.strftime("%H:%M:%S", time.gmtime(time_elapsed))
 
     # ending text
-    money_used = GPT.get_money_usage()
+    money_used = GPT.get_usage()
     ending_message = ""
     if money_used == 0:
         ending_message = "Thank you for saving Wang's money."
@@ -86,15 +90,16 @@ This costed Wang ${money_used}
     )
 
 
-# !save
-@BOT.command(name="save", help="Saves the history to a json file.")
+# !savewang
+@BOT.command(name="savewang", help="Saves current history to a json file.")
 async def save_command(ctx, *, file_name):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !save {file_name}") 
     # check if file name is valid
     if len(file_name) == 0:
         await ctx.send("Please enter a file name.")
         return
     # format file name
-    file_name = HISTORY_FILE_DIR + file_name + ".json"
+    file_name = HIDDEN_FILE_DIR + file_name + ".json"
     # save history
     if not GPT.save_history(file_name):
         await ctx.send(f"Could not save history to {file_name}.")
@@ -104,15 +109,16 @@ async def save_command(ctx, *, file_name):
     await ctx.send(f"History saved to {file_name}.")
 
 
-# !load
-@BOT.command(name="load", help="Loads the history from a json file.")
+# !loadwang
+@BOT.command(name="loadwang", help="Loads the history from a json file.")
 async def load_command(ctx, *, file_name):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !load {file_name}") 
     # check if file name is valid
     if len(file_name) == 0:
         await ctx.send("Please enter a file name.")
         return
     # format file name
-    file_name = HISTORY_FILE_DIR + file_name + ".json"
+    file_name = HIDDEN_FILE_DIR + file_name + ".json"
 
     # load history
     if not GPT.load_history(file_name):
@@ -121,6 +127,34 @@ async def load_command(ctx, *, file_name):
 
     await ctx.send(f"History loaded from {file_name}.")
 
+# !reset 
+@BOT.command(name="softresetwang", help="Resets the history (keeps initial system prompt).")
+async def softreset_command(ctx):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !softreset.") 
+    GPT.clear_history()
+    await ctx.send("History reset.")
+
+# !showwang
+@BOT.command(name="showwang", help="Shows the current history (does not include system prompts).")
+async def show_command(ctx):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !showwang.") 
+
+
+    if len(GPT.get_history()) == 0:
+        await ctx.send("History is empty.")
+        return
+    
+    formatted_history = ""
+    for message in GPT.get_history(): 
+        formatted_history += f"{message['role']}: {message['content']}\n"
+    await ctx.send(formatted_history)
+
+
+# !wangpic
+@BOT.command(name="wangpic", help="Generate image from a prompt.")
+async def wangimg_command(ctx, *, message: str):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}") 
+    await ctx.send(GPT.get_image_response(message))
 
 # on message
 @BOT.event
@@ -131,3 +165,4 @@ async def on_message(message):
 
 
 BOT.run(TOKEN)
+
