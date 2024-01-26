@@ -11,7 +11,7 @@ API_KEY = api_keys.gpt_api_key
 # language model settings
 LANG_MODEL = "gpt-4-0125-preview"  # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
 TEXT_PRICING_RATE = 0.0010 / 1000  # change if change model
-HISTORY_FILE_DIR = "./secret/history/"
+HISTORY_FILE_DIR = "./secret/"
 
 # image model settings
 IMG_MODEL = "dall-e-3"  # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / image")
