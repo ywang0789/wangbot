@@ -135,7 +135,7 @@ async def help(ctx):
 async def hi_command(ctx):
     """Says hi to message author."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !hi.")
-    await ctx.send(f"Hi, {ctx.author.name}!")
+    await ctx.send(f"Hi, {ctx.author.display_name}!")
 
 
 # !wangbot
@@ -143,7 +143,7 @@ async def hi_command(ctx):
 async def wangbot_command(ctx, *, message: str):
     """Get text response from Wangbot GPT."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
-    message = ctx.author.name + ": " + message
+    message = ctx.author.display_name + ": " + message
     await ctx.send(GPT.get_text_response(message))
 
 
