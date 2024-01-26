@@ -1,6 +1,5 @@
 """ file for voice generation """
 import elevenlabs
-import elevenlabs
 import api_keys
 
 API_KEY = api_keys.elevenlabs_api_key

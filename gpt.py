@@ -3,7 +3,6 @@ For making a gpt chatbot.
 """
 import openai
 import api_keys
-import secret.prompts as prompts
 import json
 
 API_KEY = api_keys.gpt_api_key
@@ -26,11 +25,12 @@ the format is:
 <name>: <message>
 Your responses do not need to follow this format.
 """
-
+# secret system prompt
 try: 
+    import secret.prompts as prompts
     SYSTEM_PROMPT = prompts.SYSTEM_PROMPT1  # hehe ;)
 except: # you do not have the secret sauce
-    SYSTEM_PROMPT = ''
+    SYSTEM_PROMPT = 'placeholder'
 
 
 class gpt:
