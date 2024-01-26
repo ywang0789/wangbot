@@ -3,6 +3,7 @@ import api_keys
 import discord
 from discord.ext import commands
 import gpt
+import voice
 import time
 import secret.messages as messages
 
@@ -59,6 +60,11 @@ async def help(ctx):
     main_embed.add_field(
         name="!wangpic <message>",
         value="Generate image from a prompt.",
+        inline=False,
+    )
+    main_embed.add_field(
+        name="!wangspeak <message>",
+        value="Generate voice from a prompt.",
         inline=False,
     )
     main_embed.add_field(
@@ -128,6 +134,37 @@ async def hi_command(ctx):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !hi.")
     await ctx.send(f"Hi, {ctx.author.name}!")
 
+# !wangbot
+@BOT.command(name="wangbot")
+async def wangbot_command(ctx, *, message: str):
+    """Get text response from Wangbot GPT."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
+    message = ctx.author.name + ": " + message
+    await ctx.send(GPT.get_text_response(message))
+
+
+# !wangpic
+@BOT.command(name="wangpic")
+async def wangimg_command(ctx, *, message: str):
+    """Generate image from a prompt."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
+    await ctx.send(GPT.get_image_response(message))
+
+# !wangspeak
+@BOT.command(name="wangspeak")
+async def wangspeak_command(ctx, *, message: str):
+    """Generate voice from a prompt."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangspeak {message}")
+
+    #validate message
+    if len(message) == 0:
+        await ctx.send("Please enter a message.")
+        return
+
+    if not voice.get_speech(message):
+        await ctx.send("Could not generate speech.")
+
+    await ctx.send(file=discord.File(voice.AUDIO_FILE_NAME))
 
 # !wanginfo
 @BOT.command(name="wanginfo")
@@ -155,24 +192,6 @@ async def usage_command(ctx):
     await ctx.send(
         f"```Start time: {FORMATTED_START_TIME}\nLength: {formated_time_elapsed}\nThis costed Wang ${money_used}\n{ending_message}```"
     )
-
-
-# !wangbot
-@BOT.command(name="wangbot")
-async def wangbot_command(ctx, *, message: str):
-    """Get text response from Wangbot GPT."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
-    message = ctx.author.name + ": " + message
-    await ctx.send(GPT.get_text_response(message))
-
-
-# !wangpic
-@BOT.command(name="wangpic")
-async def wangimg_command(ctx, *, message: str):
-    """Generate image from a prompt."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
-    await ctx.send(GPT.get_image_response(message))
-
 
 # !showwang
 @BOT.command(name="showwang")

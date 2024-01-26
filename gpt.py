@@ -72,6 +72,19 @@ class gpt:
 
         return response_content
 
+    def get_image_response(self, user_input: str) -> str:
+        """Returns an image response from GPT."""
+        response = self.client.images.generate(
+            model=IMG_MODEL,
+            prompt=user_input,
+            size=IMG_SIZE,
+            quality=IMG_QUALITY,
+            n=1,
+        )
+        image_url = response.data[0].url
+        self.usage += IMG_PRICING_RATE
+        return image_url
+
     def append_system_prompt(self, new_system_prompt: str) :
         """Appends a new system prompt to the history."""
         self.history.append({'role': 'assistant', 'content': new_system_prompt})
@@ -121,19 +134,6 @@ class gpt:
     def get_history(self) -> list:
         """Returns the history. (does not include system prompts) :)"""
         return self.history[2:]
-
-    def get_image_response(self, user_input: str) -> str:
-        """Returns an image response from GPT."""
-        response = self.client.images.generate(
-            model=IMG_MODEL,
-            prompt=user_input,
-            size=IMG_SIZE,
-            quality=IMG_QUALITY,
-            n=1,
-        )
-        image_url = response.data[0].url
-        self.usage += IMG_PRICING_RATE
-        return image_url
 
     def get_history_list(self) -> list:
         """Returns list of all files in ./secrets/"""
