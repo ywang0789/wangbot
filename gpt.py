@@ -5,13 +5,13 @@ import openai
 import api_keys
 import secret.prompts as prompts
 import json
-import time
 
 API_KEY = api_keys.gpt_api_key
 
 # language model settings
 LANG_MODEL = 'gpt-4-0125-preview'  # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
 TEXT_PRICING_RATE = 0.0010 / 1000  # change if change model
+HISTORY_FILE_DIR = "./secret/history/"
 
 # image model settings
 IMG_MODEL = 'dall-e-3'  # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / image")
@@ -84,20 +84,20 @@ class gpt:
         """Returns the session usage."""
         return self.usage
 
-    def save_history_to(self, file_name: str = 'history.json') -> bool:
+    def save_history_to(self, file_name: str) -> bool:
         """Saves the history to a json file."""
         try:
-            with open(file_name, 'w') as file:
+            with open(HISTORY_FILE_DIR + file_name + '.json', 'w') as file:
                 json.dump(self.history, file)
         except FileNotFoundError:
             return False
 
         return True
 
-    def load_history_from(self, file_name: str = 'history.json') -> bool:
+    def load_history_from(self, file_name: str) -> bool:
         """Loads the history from a json file."""
         try:
-            with open(file_name, 'r') as file:
+            with open(HISTORY_FILE_DIR + file_name + '.json', 'r') as file:
                 self.history = json.load(file)
         except FileNotFoundError:
             return False
@@ -135,8 +135,12 @@ class gpt:
         self.usage += IMG_PRICING_RATE
         return image_url
 
+    def get_history_list(self) -> list:
+        """Returns list of all files in ./secrets/"""
+
+        
 
 if __name__ == '__main__':
     b = gpt()
     # print(b.get_text_response("tim: Hello, what is your name?"))
-    print(b.get_image_response("picutre of a cat"))
+    print(b.get_image_response("piccture of a cat"))

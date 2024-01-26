@@ -4,13 +4,14 @@ import discord
 from discord.ext import commands
 import gpt
 import time
+import secret.messages as messages
 
 # bot setup
 TOKEN = api_keys.discord_token
 INTENTS = discord.Intents.default()
 INTENTS.messages = True
 INTENTS.message_content = True
-BOT = commands.Bot(command_prefix='!', intents=INTENTS)
+BOT = commands.Bot(command_prefix="!", intents=INTENTS, help_command=None)
 
 # gpt setup
 GPT = gpt.gpt()
@@ -18,7 +19,10 @@ START_TIME = time.time()
 FORMATTED_START_TIME = time.strftime(
     "%a, %d %b %Y %H:%M:%S", time.localtime(START_TIME)
 )
-HIDDEN_FILE_DIR = './secret/'
+
+# messages
+WARNING_MESSAGE = messages.WARNING_MESSAGE
+ATTACK_MESSAGE = messages.ATTACK_MESSAGE
 
 
 # on start
@@ -26,6 +30,7 @@ HIDDEN_FILE_DIR = './secret/'
 async def on_ready():
     """Prints when bot is ready."""
     print(f"{BOT.user} has connected to Discord!")
+
 
 # on message
 @BOT.event
@@ -35,43 +40,90 @@ async def on_message(message):
     await BOT.process_commands(message)
 
 
+#############COMMANDS#################
+# !help
+@BOT.command(name="help")
+async def help(ctx):
+    embed = discord.Embed(
+        title="Help", description="List of available commands:", color=0x00FF00
+    )
+    embed.add_field(name="!hi", value="Says hi to message author.", inline=True)
+    embed.add_field(
+        name="!wanginfo",
+        value="Gets info about current session.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!wangbot <message>",
+        value="Get text response from Wangbot GPT.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!wangpic <message>",
+        value="Generate image from a prompt.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!showwang",
+        value="Shows the current history (does not include system prompts).",
+        inline=True,
+    )
+    embed.add_field(
+        name="!appendwang <message>",
+        value="Appends a new system prompt <message> to end of history.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!overwritewang <message>",
+        value="Overwrites the system prompt with <message>.",
+        inline=True,
+    )
+
+    embed.add_field(
+        name="!savewang <file_name>",
+        value="Saves current history to <file_name>.json.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!loadwang <file_name>",
+        value="Loads the history from <file_name>.json.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!softresetwang",
+        value="Resets the history but keeps initial system prompts untouched\.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!hardresetwang",
+        value="Resets the history and sets system prompt to default.",
+        inline=True,
+    )
+
+    embed.add_field(
+        name="!atkwang",
+        value="Print attack Wang message.",
+        inline=True,
+    )
+    embed.add_field(
+        name="!warnwang",
+        value="Print warn Wang message.",
+        inline=True,
+    )
+
+    await ctx.send(embed=embed)
+
+
 # !hello
-@BOT.command(name='hi', help="Says hi to you.")
+@BOT.command(name="hi")
 async def hi_command(ctx):
     """Says hi to message author."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !hi.")
     await ctx.send(f"Hi, {ctx.author.name}!")
 
 
-# !wangbot
-@BOT.command(name='wangbot', help="Talk to Wangbot.")
-async def wangbot_command(ctx, *, message: str):
-    """Get text response from Wangbot GPT."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
-    message = ctx.author.name + ": " + message
-    await ctx.send(GPT.get_text_response(message))
-
-
-# !appendwang
-@BOT.command(name='appendwang', help="Appends a new system prompt.")
-async def appendwang_command(ctx, *, message: str):
-    """Appends a new system prompt to end of history."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !appendwang {message}")
-    GPT.append_system_prompt(message)
-    await ctx.send("System prompt appened.")
-
-
-# !overwritewang
-@BOT.command(name='overwritewang', help="Overwrites the system prompt with given message.")
-async def overwritewang_command(ctx, *, message: str):
-    """Overwrites the system prompt with message."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !overwritewang {message}")
-    GPT.overwrite_system_prompt(message)
-    await ctx.send("System prompt overwritten.")
-
-
 # !wanginfo
-@BOT.command(name='wanginfo', help="Gets info about current session.")
+@BOT.command(name="wanginfo")
 async def usage_command(ctx):
     """Gets info about current session."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wanginfo.")
@@ -98,69 +150,25 @@ async def usage_command(ctx):
     )
 
 
-# !savewang
-@BOT.command(name='savewang', help="Saves current history to a json file name.")
-async def save_command(ctx, *, file_name):
-    """Saves current history to a json file name."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !save {file_name}")
-    # check if file name is valid
-    if len(file_name) == 0:
-        await ctx.send("Please enter a file name.")
-        return
-    # format file name
-    file_name = HIDDEN_FILE_DIR + file_name + '.json'
-    # save history
-    if not GPT.save_history_to(file_name):
-        await ctx.send(f"Could not save history to {file_name}.")
-        return
-
-    await ctx.send(f"History saved to {file_name}.")
+# !wangbot
+@BOT.command(name="wangbot")
+async def wangbot_command(ctx, *, message: str):
+    """Get text response from Wangbot GPT."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
+    message = ctx.author.name + ": " + message
+    await ctx.send(GPT.get_text_response(message))
 
 
-# !loadwang
-@BOT.command(name='loadwang', help="Loads the history from a json file name.")
-async def load_command(ctx, *, file_name):
-    """Loads the history from a json file name."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !load {file_name}")
-    # check if file name is valid
-    if len(file_name) == 0:
-        await ctx.send("Please enter a file name.")
-        return
-    # format file name
-    file_name = HIDDEN_FILE_DIR + file_name + '.json'
+# !wangpic
+@BOT.command(name="wangpic")
+async def wangimg_command(ctx, *, message: str):
+    """Generate image from a prompt."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
+    await ctx.send(GPT.get_image_response(message))
 
-    # load history
-    if not GPT.load_history_from(file_name):
-        await ctx.send(f"Could not load history from {file_name}.")
-        return
-
-    await ctx.send(f"History loaded from {file_name}.")
-
-
-# !softresetwang
-@BOT.command(
-    name='softresetwang', help="Resets the history (keeps initial system prompt)."
-)
-async def softreset_command(ctx):
-    """Resets the history (keeps initial system prompt)."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !softreset.")
-    GPT.soft_reset_history()
-    await ctx.send("History has been reset softly.")
-
-# !hardresetwang
-@BOT.command(
-    name='hardresetwang', help="Resets the history (sets system prompt to default)."
-)
-async def hardreset_command(ctx):
-    """Resets the history (sets system prompt to default)."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !hardreset.")
-    GPT.hard_reset_history()
-    await ctx.send("History has been reset hardly.")
 
 # !showwang
-@BOT.command(
-    name='showwang', help="Shows the current history (does not include system prompts)."
-)
+@BOT.command(name="showwang")
 async def show_command(ctx):
     """Shows the current history (does not include system prompts)."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !showwang.")
@@ -175,12 +183,92 @@ async def show_command(ctx):
     await ctx.send(formatted_history)
 
 
-# !wangpic
-@BOT.command(name='wangpic', help="Generate image from a prompt.")
-async def wangimg_command(ctx, *, message: str):
-    """Generate image from a prompt."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
-    await ctx.send(GPT.get_image_response(message))
+# !appendwang
+@BOT.command(name="appendwang")
+async def appendwang_command(ctx, *, message: str):
+    """Appends a new system prompt to end of history."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !appendwang {message}")
+    GPT.append_system_prompt(message)
+    await ctx.send("System prompt appened.")
+
+
+# !overwritewang
+@BOT.command(name="overwritewang")
+async def overwritewang_command(ctx, *, message: str):
+    """Overwrites the system prompt with message."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !overwritewang {message}")
+    GPT.overwrite_system_prompt(message)
+    await ctx.send("System prompt overwritten.")
+
+
+# !savewang
+@BOT.command(name="savewang")
+async def save_command(ctx, *, file_name):
+    """Saves current history to a json file name."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !save {file_name}")
+
+    # check if file name is valid
+    if len(file_name) == 0 or len(file_name) > 10:
+        await ctx.send("Please enter new file name.")
+        return
+    
+    # save history
+    if not GPT.save_history_to(file_name):
+        await ctx.send(f"Could not save history to {file_name}.json.")
+        return
+
+    await ctx.send(f"History saved to {file_name}.json.")
+
+
+# !loadwang
+@BOT.command(name="loadwang")
+async def load_command(ctx, *, file_name):
+    """Loads the history from a json file name."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !load {file_name}")
+
+    # check if file name is valid
+    if len(file_name) == 0 or len(file_name) > 10:
+        await ctx.send("Please enter a new file name.")
+        return
+
+    # load history
+    if not GPT.load_history_from(file_name):
+        await ctx.send(f"Could not load history from {file_name}.json.")
+        return
+
+    await ctx.send(f"History loaded from {file_name}.json.")
+
+
+# !softresetwang
+@BOT.command(name="softresetwang")
+async def softreset_command(ctx):
+    """Resets the history (keeps initial system prompt)."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !softreset.")
+    GPT.soft_reset_history()
+    await ctx.send("History has been reset softly.")
+
+
+# !hardresetwang
+@BOT.command(name="hardresetwang")
+async def hardreset_command(ctx):
+    """Resets the history (sets system prompt to default)."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !hardreset.")
+    GPT.hard_reset_history()
+    await ctx.send("History has been reset hardly.")
+
+
+# !atkwang
+@BOT.command(name="atkwang")
+async def atkwang_command(ctx):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !atkwang.")
+    await ctx.send(ATTACK_MESSAGE)
+
+
+# !warnwang
+@BOT.command(name="warnwang")
+async def warnwang_command(ctx):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !warnwang.")
+    await ctx.send(WARNING_MESSAGE)
 
 
 BOT.run(TOKEN)
