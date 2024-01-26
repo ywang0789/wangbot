@@ -3,7 +3,7 @@
 - Dall E image generation
 - Elevenlabs voice generation
 
-## keys.json structure
+## './secret/keys.json' structure
 
 ```
 {
