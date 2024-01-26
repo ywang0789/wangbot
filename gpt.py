@@ -3,18 +3,18 @@ For making a gpt chatbot.
 """
 import openai
 import api_keys
-import hidden.prompts
+import secret.prompts as prompts
 import json
 import time
 
 API_KEY = api_keys.gpt_api_key
 
 # language model settings
-LANG_MODEL = "gpt-3.5-turbo-1106" # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
+LANG_MODEL = "gpt-4-0125-preview" # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
 TEXT_PRICING_RATE = 0.0010 / 1000  # change if change model
 
 # image model settings
-IMG_MODEL = "dall-e-2" # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / image")
+IMG_MODEL = "dall-e-3" # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / image")
 IMG_SIZE = "1024x1024"
 IMG_PRICING_RATE = 0.020 # change if change model
 IMG_QUALITY = "standard"  
@@ -27,7 +27,7 @@ Your responses do not need to follow this format.
 
 """
 
-SYSTEM_PROMPT = hidden.prompts.SYSTEM_PROMPT1  # hehe ;)
+SYSTEM_PROMPT = prompts.SYSTEM_PROMPT1  # hehe ;)
 
 
 class gpt:
