@@ -26,7 +26,11 @@ the format is:
 <name>: <message>
 Your responses do not need to follow this format.
 """
-SYSTEM_PROMPT = prompts.SYSTEM_PROMPT1  # hehe ;)
+
+try: 
+    SYSTEM_PROMPT = prompts.SYSTEM_PROMPT1  # hehe ;)
+except: # you do not have the secret sauce
+    SYSTEM_PROMPT = ''
 
 
 class gpt:
@@ -102,7 +106,8 @@ class gpt:
         try:
             with open(HISTORY_FILE_DIR + file_name + ".json", "w") as file:
                 json.dump(self.history, file)
-        except FileNotFoundError:
+        except Exception as e:
+            print(e)
             return False
 
         return True
@@ -112,7 +117,8 @@ class gpt:
         try:
             with open(HISTORY_FILE_DIR + file_name + ".json", "r") as file:
                 self.history = json.load(file)
-        except FileNotFoundError:
+        except Exception as e:
+            print(e)
             return False
 
         return True
