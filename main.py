@@ -44,74 +44,81 @@ async def on_message(message):
 # !help
 @BOT.command(name="help")
 async def help(ctx):
-    embed = discord.Embed(
-        title="Help", description="List of available commands:", color=0x00FF00
+    # Main commands
+    main_embed = discord.Embed(
+        title="Main commands",
+        description="List of available commands:",
+        color=0x00FF00,
     )
-    embed.add_field(name="!hi", value="Says hi to message author.", inline=True)
-    embed.add_field(
-        name="!wanginfo",
-        value="Gets info about current session.",
-        inline=True,
-    )
-    embed.add_field(
+    main_embed.add_field(name="!hi", value="Says hi to message author.", inline=False)
+    main_embed.add_field(
         name="!wangbot <message>",
         value="Get text response from Wangbot GPT.",
-        inline=True,
+        inline=False,
     )
-    embed.add_field(
+    main_embed.add_field(
         name="!wangpic <message>",
         value="Generate image from a prompt.",
-        inline=True,
+        inline=False,
     )
-    embed.add_field(
-        name="!showwang",
-        value="Shows the current history (does not include system prompts).",
-        inline=True,
-    )
-    embed.add_field(
-        name="!appendwang <message>",
-        value="Appends a new system prompt <message> to end of history.",
-        inline=True,
-    )
-    embed.add_field(
-        name="!overwritewang <message>",
-        value="Overwrites the system prompt with <message>.",
-        inline=True,
-    )
-
-    embed.add_field(
-        name="!savewang <file_name>",
-        value="Saves current history to <file_name>.json.",
-        inline=True,
-    )
-    embed.add_field(
-        name="!loadwang <file_name>",
-        value="Loads the history from <file_name>.json.",
-        inline=True,
-    )
-    embed.add_field(
-        name="!softresetwang",
-        value="Resets the history but keeps initial system prompts untouched\.",
-        inline=True,
-    )
-    embed.add_field(
-        name="!hardresetwang",
-        value="Resets the history and sets system prompt to default.",
-        inline=True,
-    )
-
-    embed.add_field(
+    main_embed.add_field(
         name="!atkwang",
         value="Print attack Wang message.",
-        inline=True,
+        inline=False,
     )
-    embed.add_field(
+    main_embed.add_field(
         name="!warnwang",
         value="Print warn Wang message.",
-        inline=True,
+        inline=False,
+    )
+    main_embed.add_field(
+        name="!wanginfo",
+        value="Gets info about current session.",
+        inline=False,
     )
 
-    await ctx.send(embed=embed)
+    await ctx.send(embed=main_embed)
+
+    # Config commands
+    config_embed = discord.Embed(title="Config commands", description="Configuring commands for WangBot" ,color=0xFF0000)
+    main_embed.add_field(
+        name="!showwang",
+        value="Shows the current history (does not include system prompts).",
+        inline=False,
+    )
+    config_embed.add_field(
+        name="!appendwang <message>",
+        value="Appends a new system prompt <message> to end of history.",
+        inline=False,
+    )
+    config_embed.add_field(
+        name="!overwritewang <message>",
+        value="Overwrites the system prompt with <message>.",
+        inline=False,
+    )
+
+    config_embed.add_field(
+        name="!savewang <file_name>",
+        value="Saves current history to <file_name>.json.",
+        inline=False,
+    )
+    config_embed.add_field(
+        name="!loadwang <file_name>",
+        value="Loads the history from <file_name>.json.",
+        inline=False,
+    )
+    config_embed.add_field(
+        name="!softresetwang",
+        value="Resets the history but keeps initial system prompts untouched\.",
+        inline=False,
+    )
+    config_embed.add_field(
+        name="!hardresetwang",
+        value="Resets the history and sets system prompt to default.",
+        inline=False,
+    )
+    await ctx.send(embed=config_embed)
+    
 
 
 # !hello
@@ -211,7 +218,7 @@ async def save_command(ctx, *, file_name):
     if len(file_name) == 0 or len(file_name) > 10:
         await ctx.send("Please enter new file name.")
         return
-    
+
     # save history
     if not GPT.save_history_to(file_name):
         await ctx.send(f"Could not save history to {file_name}.json.")
