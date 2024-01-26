@@ -1,5 +1,5 @@
 """ This file contains the API keys """
-import json 
+import json
 
 with open("secret/keys.json", "r") as file:
     keys = json.load(file)

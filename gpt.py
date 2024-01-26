@@ -9,15 +9,15 @@ import json
 API_KEY = api_keys.gpt_api_key
 
 # language model settings
-LANG_MODEL = 'gpt-4-0125-preview'  # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
+LANG_MODEL = "gpt-4-0125-preview"  # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
 TEXT_PRICING_RATE = 0.0010 / 1000  # change if change model
 HISTORY_FILE_DIR = "./secret/history/"
 
 # image model settings
-IMG_MODEL = 'dall-e-3'  # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / image")
-IMG_SIZE = '1024x1024'
+IMG_MODEL = "dall-e-3"  # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / image")
+IMG_SIZE = "1024x1024"
 IMG_PRICING_RATE = 0.020  # change if change model
-IMG_QUALITY = 'standard'
+IMG_QUALITY = "standard"
 
 # system prompts
 CONSTANT_SYSTEM_PROMPT = """
@@ -39,8 +39,8 @@ class gpt:
         # init history for saving context
         self.history = []
         # set system prompt to history
-        self.history.append({'role': 'system', 'content': CONSTANT_SYSTEM_PROMPT})
-        self.history.append({'role': 'system', 'content': SYSTEM_PROMPT})
+        self.history.append({"role": "system", "content": CONSTANT_SYSTEM_PROMPT})
+        self.history.append({"role": "system", "content": SYSTEM_PROMPT})
 
         # session usage
         self.usage = 0.00
@@ -56,7 +56,7 @@ class gpt:
             return "Please keep your input under 500 characters."
 
         # add user message to history
-        self.history.append({'role': 'user', 'content': user_input})
+        self.history.append({"role": "user", "content": user_input})
         # get completion
         response = self.client.chat.completions.create(
             model=LANG_MODEL, messages=self.history
@@ -65,7 +65,7 @@ class gpt:
         response_content = response.choices[0].message.content
 
         # add response to history
-        self.history.append({'role': 'assistant', 'content': response_content})
+        self.history.append({"role": "assistant", "content": response_content})
 
         # update session usage
         self.usage += response.usage.total_tokens * TEXT_PRICING_RATE
@@ -85,13 +85,13 @@ class gpt:
         self.usage += IMG_PRICING_RATE
         return image_url
 
-    def append_system_prompt(self, new_system_prompt: str) :
+    def append_system_prompt(self, new_system_prompt: str):
         """Appends a new system prompt to the history."""
-        self.history.append({'role': 'assistant', 'content': new_system_prompt})
+        self.history.append({"role": "assistant", "content": new_system_prompt})
 
     def overwrite_system_prompt(self, new_system_prompt: str):
         """Sets the system prompt to the new system prompt."""
-        self.history[0] = {'role': 'system', 'content': new_system_prompt}
+        self.history[0] = {"role": "system", "content": new_system_prompt}
 
     def get_usage(self) -> float:
         """Returns the session usage."""
@@ -100,7 +100,7 @@ class gpt:
     def save_history_to(self, file_name: str) -> bool:
         """Saves the history to a json file."""
         try:
-            with open(HISTORY_FILE_DIR + file_name + '.json', 'w') as file:
+            with open(HISTORY_FILE_DIR + file_name + ".json", "w") as file:
                 json.dump(self.history, file)
         except FileNotFoundError:
             return False
@@ -110,7 +110,7 @@ class gpt:
     def load_history_from(self, file_name: str) -> bool:
         """Loads the history from a json file."""
         try:
-            with open(HISTORY_FILE_DIR + file_name + '.json', 'r') as file:
+            with open(HISTORY_FILE_DIR + file_name + ".json", "r") as file:
                 self.history = json.load(file)
         except FileNotFoundError:
             return False
@@ -120,12 +120,12 @@ class gpt:
     def soft_reset_history(self):
         """Clears the history, except for the system prompts."""
         self.history = self.history[0:2]
-    
+
     def hard_reset_history(self):
         """Clears the history, system prompts set as defaults."""
         self.history = []
-        self.history.append({'role': 'system', 'content': CONSTANT_SYSTEM_PROMPT})
-        self.history.append({'role': 'system', 'content': SYSTEM_PROMPT})
+        self.history.append({"role": "system", "content": CONSTANT_SYSTEM_PROMPT})
+        self.history.append({"role": "system", "content": SYSTEM_PROMPT})
 
     def total_reset_history(self):
         """Clears ALL history"""
@@ -138,9 +138,8 @@ class gpt:
     def get_history_list(self) -> list:
         """Returns list of all files in ./secrets/"""
 
-        
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     b = gpt()
     # print(b.get_text_response("tim: Hello, what is your name?"))
     print(b.get_image_response("piccture of a cat"))

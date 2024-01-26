@@ -86,7 +86,11 @@ async def help(ctx):
     await ctx.send(embed=main_embed)
 
     # Config commands
-    config_embed = discord.Embed(title="Config commands", description="Configuring commands for WangBot" ,color=0xFF0000)
+    config_embed = discord.Embed(
+        title="Config commands",
+        description="Configuring commands for WangBot",
+        color=0xFF0000,
+    )
     main_embed.add_field(
         name="!showwang",
         value="Shows the current history (does not include system prompts).",
@@ -124,7 +128,6 @@ async def help(ctx):
         inline=False,
     )
     await ctx.send(embed=config_embed)
-    
 
 
 # !hello
@@ -133,6 +136,7 @@ async def hi_command(ctx):
     """Says hi to message author."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !hi.")
     await ctx.send(f"Hi, {ctx.author.name}!")
+
 
 # !wangbot
 @BOT.command(name="wangbot")
@@ -150,13 +154,14 @@ async def wangimg_command(ctx, *, message: str):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
     await ctx.send(GPT.get_image_response(message))
 
+
 # !wangspeak
 @BOT.command(name="wangspeak")
 async def wangspeak_command(ctx, *, message: str):
     """Generate voice from a prompt."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangspeak {message}")
 
-    #validate message
+    # validate message
     if len(message) == 0:
         await ctx.send("Please enter a message.")
         return
@@ -165,6 +170,7 @@ async def wangspeak_command(ctx, *, message: str):
         await ctx.send("Could not generate speech.")
 
     await ctx.send(file=discord.File(voice.AUDIO_FILE_NAME))
+
 
 # !wanginfo
 @BOT.command(name="wanginfo")
@@ -192,6 +198,7 @@ async def usage_command(ctx):
     await ctx.send(
         f"```Start time: {FORMATTED_START_TIME}\nLength: {formated_time_elapsed}\nThis costed Wang ${money_used}\n{ending_message}```"
     )
+
 
 # !showwang
 @BOT.command(name="showwang")
