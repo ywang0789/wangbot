@@ -1,8 +1,8 @@
 """ main file for bot """
-import api_keys 
-import discord 
+import api_keys
+import discord
 from discord.ext import commands
-import gpt 
+import gpt
 import voice
 import time
 
@@ -25,12 +25,14 @@ FORMATTED_START_TIME = time.strftime(
 # messages
 try:
     import secret.messages as messages
+
     WARNING_MESSAGE = messages.WARNING_MESSAGE
     ATTACK_MESSAGE = messages.ATTACK_MESSAGE
 except Exception as e:
     print("Thou dost not have secret sauce.")
-    WARNING_MESSAGE = 'placeholder'
-    ATTACK_MESSAGE = 'placeholder'
+    WARNING_MESSAGE = "placeholder"
+    ATTACK_MESSAGE = "placeholder"
+
 
 # on start
 @BOT.event
