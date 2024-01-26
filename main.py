@@ -157,7 +157,7 @@ async def wangimg_command(ctx, *, message: str):
 
 # !wangspeak
 @BOT.command(name="wangspeak")
-async def wangspeak_command(ctx, *, message: str):
+async def wangspeak_command(ctx, *, message: str = ""):
     """Generate voice from a prompt."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangspeak {message}")
 
@@ -236,7 +236,7 @@ async def overwritewang_command(ctx, *, message: str):
 
 # !savewang
 @BOT.command(name="savewang")
-async def save_command(ctx, *, file_name):
+async def save_command(ctx, *, file_name: str = ""):
     """Saves current history to a json file name."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !save {file_name}")
 
@@ -255,7 +255,7 @@ async def save_command(ctx, *, file_name):
 
 # !loadwang
 @BOT.command(name="loadwang")
-async def load_command(ctx, *, file_name):
+async def load_command(ctx, *, file_name: str = ""):
     """Loads the history from a json file name."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !load {file_name}")
 
