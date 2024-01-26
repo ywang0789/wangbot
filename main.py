@@ -97,7 +97,7 @@ async def help(ctx):
         description="Configuring commands for WangBot",
         color=0xFF0000,
     )
-    main_embed.add_field(
+    config_embed.add_field(
         name="!showwang",
         value="Shows the current history (does not include system prompts).",
         inline=False,
