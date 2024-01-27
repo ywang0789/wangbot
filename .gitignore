@@ -4,6 +4,8 @@
 !/secret/histories/*
 !/secret/images/
 !/secret/images/*
+!/secret/voices/
+!/secret/voices/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
