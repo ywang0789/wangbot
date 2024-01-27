@@ -110,7 +110,7 @@ async def help(ctx):
         value="Shows list of available histories to load.",
         inline=False,
     )
-    
+
     config_embed.add_field(
         name="!appendwang <message>",
         value="Appends a new system prompt <message> to end of history.",
@@ -227,7 +227,7 @@ async def usage_command(ctx):
         f"```Start time: {FORMATTED_START_TIME}\nLength: {formated_time_elapsed}\nThis costed Wang ${money_used}\n{ending_message}```"
     )
 
-
+##################CONFIG####################################
 # !showwang
 @BOT.command(name="showwang")
 async def show_command(ctx):
@@ -243,6 +243,7 @@ async def show_command(ctx):
         formatted_history += f"{message['role']}: {message['content']}\n"
     await ctx.send(formatted_history)
 
+
 # showanglist
 @BOT.command(name="showwanglist")
 async def showanglist_command(ctx):
@@ -255,8 +256,9 @@ async def showanglist_command(ctx):
     )
     for history in GPT.get_history_list():
         embed.add_field(name=history, value=" ", inline=False)
-    
+
     await ctx.send(embed=embed)
+
 
 # !appendwang
 @BOT.command(name="appendwang")
@@ -284,14 +286,15 @@ async def save_command(ctx, *, file_name: str = ""):
 
     # check if file name is valid
     if len(file_name) == 0 or len(file_name) > 10:
-        await ctx.send("Please enter new file name.")
+        await ctx.send("Please enter new file name (< 10 chars).")
         return
 
     # save history
-    if not GPT.save_history_to(file_name):
+    try:
+        GPT.save_history_to(file_name)
+    except:
         await ctx.send(f"Could not save history to {file_name}.json.")
-        return
-
+        
     await ctx.send(f"History saved to {file_name}.json.")
 
 
@@ -303,13 +306,14 @@ async def load_command(ctx, *, file_name: str = ""):
 
     # check if file name is valid
     if len(file_name) == 0 or len(file_name) > 10:
-        await ctx.send("Please enter a new file name.")
+        await ctx.send("Please enter a new file name (< 10 chars).")
         return
 
     # load history
-    if not GPT.load_history_from(file_name):
+    try:
+        GPT.load_history_from(file_name)
+    except:
         await ctx.send(f"Could not load history from {file_name}.json.")
-        return
 
     await ctx.send(f"History loaded from {file_name}.json.")
 
