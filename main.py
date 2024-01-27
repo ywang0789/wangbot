@@ -175,10 +175,11 @@ async def wangspeak_command(ctx, *, message: str = ""):
         await ctx.send("Please enter a message.")
         return
 
-    if not voice.get_speech(message):
+    file_path = voice.get_speech(message)
+    if file_path is None:
         await ctx.send("Could not generate speech.")
 
-    await ctx.send(file=discord.File(voice.AUDIO_FILE_NAME))
+    await ctx.send(file=discord.File(file_path))
 
 
 # !wanginfo
