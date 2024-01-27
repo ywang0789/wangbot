@@ -5,7 +5,7 @@ import api_keys
 API_KEY = api_keys.elevenlabs_api_key
 elevenlabs.set_api_key(API_KEY)
 
-VOICE = 'voice_a'
+VOICE = "voice_a"
 
 MODEL = "eleven_multilingual_v2"  # eleven_multilingual_v2 or eleven_turbo_v2
 
@@ -28,7 +28,9 @@ def get_speech(text: str, voice: str = VOICE) -> bool:
 
 
 if __name__ == "__main__":
-    get_speech('This week we will go through the overview of the course, instructional plan, policies and procedures and the eConestoga setup.   Once completed, we will get started with an introduction and key terms to networking.')
+    get_speech(
+        "This week we will go through the overview of the course, instructional plan, policies and procedures and the eConestoga setup.   Once completed, we will get started with an introduction and key terms to networking."
+    )
 
     voices = elevenlabs.voices()
     # print only voice name

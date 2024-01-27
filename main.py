@@ -67,7 +67,7 @@ async def help(ctx):
     )
     main_embed.add_field(
         name="!wangpic <message>",
-        value="Generate image from a prompt.",
+        value="Generate image from a prompt. (Now uploads the img instead of sending url)",
         inline=False,
     )
     main_embed.add_field(
@@ -158,9 +158,10 @@ async def wangbot_command(ctx, *, message: str):
 # !wangpic
 @BOT.command(name="wangpic")
 async def wangimg_command(ctx, *, message: str):
-    """Generate image from a prompt."""
+    """Generate image from a prompt. Sends the file path to the image."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
-    await ctx.send(GPT.get_image_response(message))
+
+    await ctx.send(file=discord.File(GPT.get_image_response(message)))
 
 
 # !wangspeak
