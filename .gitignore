@@ -1,5 +1,9 @@
 !/secret/
 /secret/*
+!/secret/histories/
+!/secret/histories/*
+!/secret/images/
+!/secret/images/*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

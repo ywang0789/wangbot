@@ -8,20 +8,21 @@ import requests
 import os
 import random
 import time
-
+SECRET_FILE_DIR = "./secret/"
 API_KEY = api_keys.gpt_api_key
 
 # language model settings
 LANG_MODEL = "gpt-4-0125-preview"  # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
 TEXT_PRICING_RATE = 0.0010 / 1000  # change if change model
-SECRET_FILE_DIR = "./secret/"
+HISTORY_FILE_DIR = SECRET_FILE_DIR + 'histories/'
+
 
 # image model settings
 IMG_MODEL = "dall-e-3"  # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / image")
 IMG_SIZE = "1024x1024"
 IMG_PRICING_RATE = 0.020  # change if change model
 IMG_QUALITY = "standard"
-IMG_FILE_NAME = 'image.png'
+IMG_FILE_DIR = SECRET_FILE_DIR + 'images/'
 
 # system prompts
 CONSTANT_SYSTEM_PROMPT = """
@@ -99,7 +100,7 @@ class gpt:
             img_response = requests.get(image_url)
             # Create a directory to save the image if it doesn't exist
             os.makedirs(SECRET_FILE_DIR, exist_ok=True)
-            
+
             # generate random number from current time for unique file name
             rand = str(int(time.time()))
             file_path = SECRET_FILE_DIR + rand + IMG_FILE_NAME
