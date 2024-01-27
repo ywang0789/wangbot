@@ -119,7 +119,7 @@ class gpt:
 
     def append_system_prompt(self, new_system_prompt: str):
         """Appends a new system prompt to the history."""
-        self.history.append({"role": "assistant", "content": new_system_prompt})
+        self.history.append({"role": "system", "content": new_system_prompt})
 
     def overwrite_system_prompt(self, new_system_prompt: str):
         """Sets the system prompt to the new system prompt."""
@@ -132,7 +132,7 @@ class gpt:
     def save_history_to(self, file_name: str) -> bool:
         """Saves the history to a json file."""
         try:
-            with open(SECRET_FILE_DIR + file_name + ".json", "w") as file:
+            with open(HISTORY_FILE_DIR + file_name + ".json", "w") as file:
                 json.dump(self.history, file)
         except Exception as e:
             print(e)
@@ -143,7 +143,7 @@ class gpt:
     def load_history_from(self, file_name: str) -> bool:
         """Loads the history from a json file."""
         try:
-            with open(SECRET_FILE_DIR + file_name + ".json", "r") as file:
+            with open(HISTORY_FILE_DIR + file_name + ".json", "r") as file:
                 self.history = json.load(file)
         except Exception as e:
             print(e)
