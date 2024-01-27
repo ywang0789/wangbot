@@ -6,15 +6,14 @@ import api_keys
 import json
 import requests 
 import os
-import random
 import time
-SECRET_FILE_DIR = "./secret/"
+import utils
 API_KEY = api_keys.gpt_api_key
 
 # language model settings
 LANG_MODEL = "gpt-4-0125-preview"  # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
 TEXT_PRICING_RATE = 0.0010 / 1000  # change if change model
-HISTORY_FILE_DIR = SECRET_FILE_DIR + 'histories/'
+HISTORY_FILE_DIR = './secret/histories/'
 
 
 # image model settings
@@ -22,7 +21,7 @@ IMG_MODEL = "dall-e-3"  # "dall-e-3" ($0.040 / image) OR "dall-e-2 ($0.020 / ima
 IMG_SIZE = "1024x1024"
 IMG_PRICING_RATE = 0.020  # change if change model
 IMG_QUALITY = "standard"
-IMG_FILE_DIR = SECRET_FILE_DIR + 'images/'
+IMG_FILE_DIR = './secret/images/'
 
 # system prompts
 CONSTANT_SYSTEM_PROMPT = """
@@ -58,6 +57,7 @@ class gpt:
     def get_text_response(self, user_input: str) -> str:
         """Returns a response from GPT. Also updates the history."""
 
+        # input validation
         user_input_len = len(user_input)
         if user_input_len == 0:
             return "Please enter something."
@@ -67,10 +67,12 @@ class gpt:
 
         # add user message to history
         self.history.append({"role": "user", "content": user_input})
+
         # get completion
         response = self.client.chat.completions.create(
             model=LANG_MODEL, messages=self.history
         )
+
         # extract content from completion
         response_content = response.choices[0].message.content
 
@@ -83,32 +85,37 @@ class gpt:
         return response_content
 
     def get_image_response(self, user_input: str):
-        """Downloads and returns an image path of url response from GPT."""
-        response = self.client.images.generate(
-            model=IMG_MODEL,
-            prompt=user_input,
-            size=IMG_SIZE,
-            quality=IMG_QUALITY,
-            n=1,
-        )
-        # get image url
-        image_url = response.data[0].url
-        self.usage += IMG_PRICING_RATE
+        """Downloads and returns an image path of url response from GPT. Returns False if failed."""
+        try:
+            # get response
+            response = self.client.images.generate(
+                model=IMG_MODEL,
+                prompt=user_input,
+                size=IMG_SIZE,
+                quality=IMG_QUALITY,
+                n=1,
+            )
 
-        # Download image
+            # get image url
+            image_url = response.data[0].url
+            self.usage += IMG_PRICING_RATE
+        except Exception as e:
+            print(e)
+
+        # Download and save image
         try:
             img_response = requests.get(image_url)
-            # Create a directory to save the image if it doesn't exist
-            os.makedirs(SECRET_FILE_DIR, exist_ok=True)
 
-            # generate random number from current time for unique file name
-            rand = str(int(time.time()))
-            file_path = SECRET_FILE_DIR + rand + IMG_FILE_NAME
+            file_path = IMG_FILE_DIR + utils.get_unique_str() + '.png'
+
+            # write
             with open(file_path, 'wb') as f:
                 f.write(img_response.content)
+
             return file_path
         except Exception as e:
-            return print(e)
+            print(e)
+            
 
     def append_system_prompt(self, new_system_prompt: str):
         """Appends a new system prompt to the history."""
