@@ -104,6 +104,13 @@ async def help(ctx):
         value="Shows the current history (does not include system prompts).",
         inline=False,
     )
+
+    config_embed.add_field(
+        name="!showwanglist",
+        value="Shows list of available histories to load.",
+        inline=False,
+    )
+    
     config_embed.add_field(
         name="!appendwang <message>",
         value="Appends a new system prompt <message> to end of history.",
@@ -151,8 +158,15 @@ async def hi_command(ctx):
 async def wangbot_command(ctx, *, message: str):
     """Get text response from Wangbot GPT."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
+
+    # format message for GPT prompt + history
     message = ctx.author.display_name + ": " + message
-    await ctx.send(GPT.get_text_response(message))
+
+    try:
+        response = GPT.get_text_response(message)
+        await ctx.send(response)
+    except:
+        await ctx.send("Could not get response.")
 
 
 # !wangpic
@@ -161,7 +175,11 @@ async def wangimg_command(ctx, *, message: str):
     """Generate image from a prompt. Sends the file path to the image."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
 
-    await ctx.send(file=discord.File(GPT.get_image_response(message)))
+    try:
+        file_path = GPT.get_image_response(message)
+        await ctx.send(file=discord.File(file_path))
+    except:
+        await ctx.send("Could not generate image.")
 
 
 # !wangspeak
@@ -175,11 +193,11 @@ async def wangspeak_command(ctx, *, message: str = ""):
         await ctx.send("Please enter a message.")
         return
 
-    file_path = voice.get_speech(message)
-    if file_path is None:
+    try:
+        file_path = voice.get_speech(message)
+        await ctx.send(file=discord.File(file_path))
+    except:
         await ctx.send("Could not generate speech.")
-
-    await ctx.send(file=discord.File(file_path))
 
 
 # !wanginfo
@@ -225,6 +243,20 @@ async def show_command(ctx):
         formatted_history += f"{message['role']}: {message['content']}\n"
     await ctx.send(formatted_history)
 
+# showanglist
+@BOT.command(name="showwanglist")
+async def showanglist_command(ctx):
+    """Shows list of available histories to load."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !showanglist.")
+
+    embed = discord.Embed(
+        title="Available histories",
+        description="List of available histories:",
+    )
+    for history in GPT.get_history_list():
+        embed.add_field(name=history, value=" ", inline=False)
+    
+    await ctx.send(embed=embed)
 
 # !appendwang
 @BOT.command(name="appendwang")

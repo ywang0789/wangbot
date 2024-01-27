@@ -2,6 +2,7 @@
 import elevenlabs
 import api_keys
 import utils
+import os
 
 API_KEY = api_keys.elevenlabs_api_key
 elevenlabs.set_api_key(API_KEY)
@@ -20,13 +21,16 @@ def get_speech(text: str, voice: str = VOICE) -> str:
             voice=voice,
             model=MODEL,
         )
+        # make dir if not exist
+        if not os.path.exists(AUDIO_FILE_DIR):
+            os.makedirs(AUDIO_FILE_DIR)
 
-        file_path = AUDIO_FILE_DIR + utils.get_unique_str() + ".mp3"
+        file_path = os.path.join(AUDIO_FILE_DIR, f"{utils.get_unique_str()}.mp3")
         elevenlabs.save(audio, file_path)
-
-        return file_path
-    except Exception as e:
-        print(e)
+    except:
+        raise Exception("Could not generate speech.")
+    
+    return file_path
         
 
 if __name__ == "__main__":
