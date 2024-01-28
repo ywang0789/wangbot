@@ -207,7 +207,8 @@ async def usage_command(ctx):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wanginfo.")
     # calculate time elapsed
     time_elapsed = time.time() - START_TIME
-    formated_time_elapsed = time.strftime("%H:%M:%S", time.gmtime(time_elapsed))
+    # formatt time to D:H:M:S
+    formated_time_elapsed = time.strftime("%d:%H:%M:%S", time.gmtime(time_elapsed))
 
     # ending text
     money_used = GPT.get_usage()
