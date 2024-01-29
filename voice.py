@@ -15,23 +15,19 @@ AUDIO_FILE_DIR = "./secret/voices/"
 
 def get_speech(text: str, voice: str = VOICE) -> str:
     """Generate speech from text and returns path to audio file."""
-    try:
-        audio = elevenlabs.generate(
-            text=text,
-            voice=voice,
-            model=MODEL,
-        )
-        # make dir if not exist
-        if not os.path.exists(AUDIO_FILE_DIR):
-            os.makedirs(AUDIO_FILE_DIR)
+    audio = elevenlabs.generate(
+        text=text,
+        voice=voice,
+        model=MODEL,
+    )
+    # make dir if not exist
+    if not os.path.exists(AUDIO_FILE_DIR):
+        os.makedirs(AUDIO_FILE_DIR)
 
-        file_path = os.path.join(AUDIO_FILE_DIR, f"{utils.get_unique_str()}.mp3")
-        elevenlabs.save(audio, file_path)
-    except:
-        raise Exception("Could not generate speech.")
+    file_path = os.path.join(AUDIO_FILE_DIR, f"{utils.get_unique_str()}.mp3")
+    elevenlabs.save(audio, file_path)
     
     return file_path
-        
 
 if __name__ == "__main__":
     get_speech(

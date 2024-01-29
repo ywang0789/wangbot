@@ -66,20 +66,16 @@ class gpt:
 
         if user_input_len > 500:
             return "Please keep your input under 500 characters."
+        
+        self.history.append({"role": "user", "content": user_input})
 
-        try:
-            # get completion
-            response = self.client.chat.completions.create(
-                model=LANG_MODEL, messages=self.history
-            )
-        except:
-            raise Exception("Could not generate response.")
+                    # get completion
+        response = self.client.chat.completions.create( model=LANG_MODEL, messages=self.history)
 
         # extract content from completion
         response_content = response.choices[0].message.content
 
         # add interaction to history
-        self.history.append({"role": "user", "content": user_input})
         self.history.append({"role": "assistant", "content": response_content})
 
         # update session usage
@@ -90,28 +86,22 @@ class gpt:
     def get_image_response(self, user_input: str):
         """Downloads and returns an image path of url response from DAll e.
         Returns False if failed."""
-        try:
+
             # get response
-            response = self.client.images.generate(
+        response = self.client.images.generate(
                 model=IMG_MODEL,
                 prompt=user_input,
                 size=IMG_SIZE,
                 quality=IMG_QUALITY,
                 n=1,
-            )
-        except:
-            raise Exception("Could not generate image.")
+        )
 
         # get image url
         image_url = response.data[0].url
         self.usage += IMG_PRICING_RATE
 
         # Download and save image
-        try:
-            img_response = requests.get(image_url)
-
-        except:
-            raise Exception("Could not download image.")
+        img_response = requests.get(image_url)
 
         # create dir is not exist
         if not os.path.exists(IMG_FILE_DIR):
@@ -179,8 +169,8 @@ class gpt:
         self.history.append({"role": "system", "content": SYSTEM_PROMPT})
 
     def total_reset_history(self):
-        """Clears ALL history"""
-        self.history = []
+        """Clears all history except the 1st system prompt."""
+        self.history = self.history[0:1]
 
     def get_history(self) -> list:
         """Returns the history.

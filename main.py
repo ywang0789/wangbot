@@ -207,9 +207,11 @@ async def usage_command(ctx):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wanginfo.")
     # calculate time elapsed
     time_elapsed = time.time() - START_TIME
-    # formatt time to D:H:M:S
-    formated_time_elapsed = time.strftime("%d:%H:%M:%S", time.gmtime(time_elapsed))
-
+    # formatt time elapsed to D:H:M:S
+    formated_time_elapsed = time.strftime(
+        "%d days, %H hours, %M minutes, %S seconds", time.gmtime(time_elapsed)
+    )
+    
     # ending text
     money_used = GPT.get_usage()
     ending_message = ""
@@ -229,6 +231,14 @@ async def usage_command(ctx):
     )
 
 ##################CONFIG####################################
+# !removewang
+@BOT.command(name="removewang")
+async def friendlywang_command(ctx):
+    """Remove all system prompts."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !friendlywang.")
+    GPT.total_reset_history()
+    await ctx.send("Goodbye")
+
 # !showwang
 @BOT.command(name="showwang")
 async def show_command(ctx):
