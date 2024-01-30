@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 import gpt
 import voice
-import time
+import datetime
 
 
 # bot setup
@@ -16,10 +16,8 @@ BOT = commands.Bot(command_prefix="!", intents=INTENTS, help_command=None)
 
 # gpt setup
 GPT = gpt.gpt()
-START_TIME = time.time()
-FORMATTED_START_TIME = time.strftime(
-    "%a, %d %b %Y %H:%M:%S", time.localtime(START_TIME)
-)
+START_TIME = datetime.datetime.now().timestamp()
+FORMATTED_START_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 
 # messages
@@ -206,11 +204,8 @@ async def usage_command(ctx):
     """Gets info about current session."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wanginfo.")
     # calculate time elapsed
-    time_elapsed = time.time() - START_TIME
-    # formatt time elapsed to D:H:M:S
-    formated_time_elapsed = time.strftime(
-        "%d days, %H hours, %M minutes, %S seconds", time.gmtime(time_elapsed)
-    )
+    time_elapsed = datetime.datetime.now().timestamp() - START_TIME
+    formated_time_elapsed = str(datetime.timedelta(seconds=time_elapsed))
     
     # ending text
     money_used = GPT.get_usage()
