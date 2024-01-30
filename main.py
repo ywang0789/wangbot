@@ -12,6 +12,7 @@ TOKEN = api_keys.discord_token
 INTENTS = discord.Intents.default()
 INTENTS.messages = True
 INTENTS.message_content = True
+INTENTS.members = True
 BOT = commands.Bot(command_prefix="!", intents=INTENTS, help_command=None)
 
 # gpt setup
@@ -22,10 +23,10 @@ FORMATTED_START_TIME = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
 # messages
 try:
-    import secret.messages as messages
+    import secret.messages as secret_messages
 
-    WARNING_MESSAGE = messages.WARNING_MESSAGE
-    ATTACK_MESSAGE = messages.ATTACK_MESSAGE
+    WARNING_MESSAGE = secret_messages.WARNING_MESSAGE
+    ATTACK_MESSAGE = secret_messages.ATTACK_MESSAGE
 except Exception as e:
     print("Thou dost not have secret sauce.")
     WARNING_MESSAGE = "placeholder"
@@ -39,11 +40,54 @@ async def on_ready():
     print(f"{BOT.user} has connected to Discord!")
 
 
+# on member join
+@BOT.event
+async def on_member_join(member):
+    """ Welcomes new members to the server."""
+    # try to find a channel named 'general' in the server
+    general_channel = discord.utils.get(member.guild.text_channels, name='general')
+    if general_channel: # if channel is found
+        gpt_message = (
+            member.display_name + ": " + "Hello, I have just joined the server!"
+        )
+        response = GPT.get_text_response(gpt_message)
+        await general_channel.send(response)
+    else: # if channel is not found
+        print(f"Could not find general channel in {member.guild.name}.")
+
 # on message
 @BOT.event
 async def on_message(message):
+    """Responds to messages and process commands."""
+
+    # ignore self
     if message.author == BOT.user:
         return
+
+    # Check if the message is a reply to the bot
+    """ responds when the bot is replied to"""
+    if message.reference is not None and message.reference.resolved:
+        replied_message = message.reference.resolved
+        if replied_message.author == BOT.user:
+            print(f"{message.created_at}:{message.author.name}: reply: {message}")
+            gpt_message = (
+                message.author.display_name + ": " + message.content
+            )  # format message for prompt
+            response = GPT.get_text_response(gpt_message)
+            await message.channel.send(response)
+            return
+
+    # BOT is mentioned
+    """ responses when the bot is mentioned """
+    if BOT.user.mentioned_in(message):
+        print(f"{message.created_at}:{message.author.name}: mention: {message}")
+        gpt_message = (
+            message.author.display_name + ": " + message.content
+        )  # format message for prompt
+        response = GPT.get_text_response(gpt_message)
+        await message.channel.send(response)
+        return
+
     await BOT.process_commands(message)
 
 
@@ -206,7 +250,7 @@ async def usage_command(ctx):
     # calculate time elapsed
     time_elapsed = datetime.datetime.now().timestamp() - START_TIME
     formated_time_elapsed = str(datetime.timedelta(seconds=time_elapsed))
-    
+
     # ending text
     money_used = GPT.get_usage()
     ending_message = ""
@@ -225,6 +269,7 @@ async def usage_command(ctx):
         f"```Start time: {FORMATTED_START_TIME}\nLength: {formated_time_elapsed}\nThis costed Wang ${money_used}\n{ending_message}```"
     )
 
+
 ##################CONFIG####################################
 # !removewang
 @BOT.command(name="removewang")
@@ -233,6 +278,7 @@ async def friendlywang_command(ctx):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !friendlywang.")
     GPT.total_reset_history()
     await ctx.send("Goodbye")
+
 
 # !showwang
 @BOT.command(name="showwang")
@@ -300,7 +346,7 @@ async def save_command(ctx, *, file_name: str = ""):
         GPT.save_history_to(file_name)
     except:
         await ctx.send(f"Could not save history to {file_name}.json.")
-        
+
     await ctx.send(f"History saved to {file_name}.json.")
 
 
