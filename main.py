@@ -275,7 +275,7 @@ async def usage_command(ctx):
 @BOT.command(name="removewang")
 async def friendlywang_command(ctx):
     """Remove all system prompts."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !friendlywang.")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !removewang.")
     GPT.total_reset_history()
     await ctx.send("Goodbye")
 
