@@ -69,7 +69,7 @@ async def on_message(message):
     if message.reference is not None and message.reference.resolved:
         replied_message = message.reference.resolved
         if replied_message.author == BOT.user:
-            print(f"{message.created_at}:{message.author.name}: reply: {message}")
+            print(f"{message.created_at}:{message.author.name}: reply: {message.content}")
             gpt_message = (
                 message.author.display_name + ": " + message.content
             )  # format message for prompt
@@ -80,7 +80,7 @@ async def on_message(message):
     # BOT is mentioned
     """ responses when the bot is mentioned """
     if BOT.user.mentioned_in(message):
-        print(f"{message.created_at}:{message.author.name}: mention: {message}")
+        print(f"{message.created_at}:{message.author.name}: mention: {message.content}")
         gpt_message = (
             message.author.display_name + ": " + message.content
         )  # format message for prompt
