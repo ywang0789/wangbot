@@ -25,8 +25,7 @@ IMG_FILE_DIR = "./secret/images/"
 
 # system prompts
 CONSTANT_SYSTEM_PROMPT = """
-You will be speaking with muliple people, their names will be indicated in the message.
-the format is:
+You will be speaking with muliple people on a chat app, their names will be indicated in the message given to you:
 <name>: <message>
 Your responses do not need to follow this format.
 """
