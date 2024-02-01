@@ -43,17 +43,18 @@ async def on_ready():
 # on member join
 @BOT.event
 async def on_member_join(member):
-    """ Welcomes new members to the server."""
+    """Welcomes new members to the server."""
     # try to find a channel named 'general' in the server
-    general_channel = discord.utils.get(member.guild.text_channels, name='general')
-    if general_channel: # if channel is found
+    general_channel = discord.utils.get(member.guild.text_channels, name="general")
+    if general_channel:  # if channel is found
         gpt_message = (
             member.display_name + ": " + "Hello, I have just joined the server!"
         )
         response = GPT.get_text_response(gpt_message)
         await general_channel.send(response)
-    else: # if channel is not found
+    else:  # if channel is not found
         print(f"Could not find general channel in {member.guild.name}.")
+
 
 # on message
 @BOT.event
@@ -69,7 +70,9 @@ async def on_message(message):
     if message.reference is not None and message.reference.resolved:
         replied_message = message.reference.resolved
         if replied_message.author == BOT.user:
-            print(f"{message.created_at}:{message.author.name}: reply: {message.content}")
+            print(
+                f"{message.created_at}:{message.author.name}: reply: {message.content}"
+            )
             gpt_message = (
                 message.author.display_name + ": " + message.content
             )  # format message for prompt
@@ -77,16 +80,16 @@ async def on_message(message):
             await message.channel.send(response)
             return
 
-    # BOT is mentioned
-    """ responses when the bot is mentioned """
-    if BOT.user.mentioned_in(message):
-        print(f"{message.created_at}:{message.author.name}: mention: {message.content}")
-        gpt_message = (
-            message.author.display_name + ": " + message.content
-        )  # format message for prompt
-        response = GPT.get_text_response(gpt_message)
-        await message.channel.send(response)
-        return
+    # # BOT is mentioned
+    # """ responses when the bot is mentioned """
+    # if BOT.user.mentioned_in(message):
+    #     print(f"{message.created_at}:{message.author.name}: mention: {message.content}")
+    #     gpt_message = (
+    #         message.author.display_name + ": " + message.content
+    #     )  # format message for prompt
+    #     response = GPT.get_text_response(gpt_message)
+    #     await message.channel.send(response)
+    #     return
 
     await BOT.process_commands(message)
 
