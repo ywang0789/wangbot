@@ -126,23 +126,30 @@ class gpt:
 
     def get_vision_response(self, prompt: str, img_url: str) -> str:
         """Returns a response from vision (text + image). Also updates the history."""
+
+        # format propmt
+        message = {
+            "role": "user",
+            "content": [
+                {"type": "text", "text": prompt},
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": img_url,
+                    },
+                },
+            ],
+        }
+        
+        # copy history into a temp var
+        # IMPORTANT: bcuz vision completion and text completion are different, they have different 'messages' param formats!!!!!
+        temp_history = self.history.copy()
+        temp_history.append(message)
+
         # get completion
         response = self.client.chat.completions.create(
             model=VISION_MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "text", "text": prompt},
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": img_url,
-                            },
-                        },
-                    ],
-                }
-            ],
+            messages=temp_history,
             max_tokens=100,
         )
 
@@ -150,7 +157,7 @@ class gpt:
         response_content = response.choices[0].message.content
 
         # add interaction to history
-        self.history.append({"role": "user", "content": prompt})
+        self.history.append({"role": "user", "content": prompt + "{image}"})
         self.history.append({"role": "assistant", "content": response_content})
 
         # update session usage
@@ -224,17 +231,16 @@ class gpt:
 
 
 if __name__ == "__main__":
+    import time
     b = gpt()
-    # print(b.get_text_response("tim: Hello, what is your name?"))
+    
     # print(b.get_image_response("piccture of a cat"))
-    # print(
-    #     b.get_vision_response(
-    #         "what is this picture?",
-    #         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9-HNAsO8F1XNtS5q90_MUuGKBrU7NoFLs-g&usqp=CAU",
-    #     )
-    # )
-    print(type(b.history))
-    print(b.get_history())
-    b.load_history_from("new")
-    print(type(b.history))
-    print(b.get_history())
+    print(
+        b.get_vision_response(
+            "what is this picture?",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9-HNAsO8F1XNtS5q90_MUuGKBrU7NoFLs-g&usqp=CAU",
+        )
+    )
+    time.sleep(10)
+    print(b.get_text_response("tim: Hello, what is your name?"))
+    
