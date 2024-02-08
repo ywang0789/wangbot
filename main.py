@@ -256,7 +256,7 @@ async def wangimg_command(ctx, *, message: str):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
 
     try:
-        file_path = GPT.get_vision_response(message)
+        file_path = GPT.get_img_response(message)
         await ctx.send(file=discord.File(file_path))
     except:
         await ctx.send("Could not generate image.")

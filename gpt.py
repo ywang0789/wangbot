@@ -89,7 +89,7 @@ class gpt:
 
         return response_content
 
-    def get_vision_response(self, user_input: str):
+    def get_img_response(self, user_input: str):
         """Downloads and returns an image path of url response from DAll e.
         Returns False if failed."""
 
