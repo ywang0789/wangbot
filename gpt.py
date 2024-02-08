@@ -75,7 +75,7 @@ class gpt:
 
         # get completion
         response = self.client.chat.completions.create(
-            model=LANG_MODEL, messages=self.history
+            model=LANG_MODEL, messages=self.history, max_tokens=100
         )
 
         # extract content from completion
@@ -143,6 +143,7 @@ class gpt:
                     ],
                 }
             ],
+            max_tokens=100,
         )
 
         # extract content from completion
@@ -228,6 +229,6 @@ if __name__ == "__main__":
     print(
         b.get_vision_response(
             "what is this picture?",
-            "https://cdn.discordapp.com/attachments/1192932013548769441/1205163298891239464/20240208144840889123.png?ex=65d75ec9&is=65c4e9c9&hm=1e32dfe17ec5748bb1c6a22f5ea1313a2097561c4ed41a68638be7a3a246154a&",
+            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9-HNAsO8F1XNtS5q90_MUuGKBrU7NoFLs-g&usqp=CAU",
         )
     )
