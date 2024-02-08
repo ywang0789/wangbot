@@ -203,16 +203,27 @@ async def hi_command(ctx):
 async def wangbot_command(ctx, *, message: str):
     """Get text response from Wangbot GPT."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
-
+    
     # format message for GPT prompt + history
-    message = ctx.author.display_name + ": " + message
-
-    try:
-        response = GPT.get_text_response(message)
-        await ctx.send(response)
-    except:
-        await ctx.send("Could not get response.")
-
+    message = ctx.author.display_name + ": " + message + "{some image url}"
+    
+    # check if message has attachment
+    if len(ctx.message.attachments) > 1: 
+        await ctx.send("Please only attach one image.")
+    elif len(ctx.message.attachments) == 1: # run vision gpt
+        # get attachment url
+        img_url = ctx.message.attachments[0].url
+        try:
+            response = GPT.get_vision_response(message, img_url)
+            await ctx.send(response)
+        except:
+            await ctx.send("Could not get image response.")
+    else: # run regular gpt
+        try:
+            response = GPT.get_text_response(message)
+            await ctx.send(response)
+        except:
+            await ctx.send("Could not get text response.")
 
 # !wangpic
 @BOT.command(name="wangpic")
@@ -221,7 +232,7 @@ async def wangimg_command(ctx, *, message: str):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangpic {message}")
 
     try:
-        file_path = GPT.get_image_response(message)
+        file_path = GPT.get_vision_response(message)
         await ctx.send(file=discord.File(file_path))
     except:
         await ctx.send("Could not generate image.")

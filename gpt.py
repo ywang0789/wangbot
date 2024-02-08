@@ -1,6 +1,7 @@
 """
 For making a gpt chatbot.
 """
+
 import api_keys
 import openai
 import json
@@ -12,8 +13,12 @@ API_KEY = api_keys.gpt_api_key
 
 # language model settings
 LANG_MODEL = "gpt-4-0125-preview"  # "gpt-4-0125-preview" ($0.01 / 1K tokens) OR "gpt-3.5-turbo-1106" ($0.0010 / 1K tokens)
-TEXT_PRICING_RATE = 0.0010 / 1000  # change if change model
+TEXT_PRICING_RATE = 0.010 / 1000  # change if change model
 HISTORY_FILE_DIR = "./secret/histories/"
+
+# vision model settings
+VISION_MODEL = "gpt-4-vision-preview"  # $0.01 / 1K tokens
+VISION_PRICING_RATE = 0.010 / 1000  # change if change model
 
 
 # image model settings
@@ -65,11 +70,13 @@ class gpt:
 
         if user_input_len > 500:
             return "Please keep your input under 500 characters."
-        
+
         self.history.append({"role": "user", "content": user_input})
 
-                    # get completion
-        response = self.client.chat.completions.create( model=LANG_MODEL, messages=self.history)
+        # get completion
+        response = self.client.chat.completions.create(
+            model=LANG_MODEL, messages=self.history
+        )
 
         # extract content from completion
         response_content = response.choices[0].message.content
@@ -82,17 +89,17 @@ class gpt:
 
         return response_content
 
-    def get_image_response(self, user_input: str):
+    def get_vision_response(self, user_input: str):
         """Downloads and returns an image path of url response from DAll e.
         Returns False if failed."""
 
-            # get response
+        # get response
         response = self.client.images.generate(
-                model=IMG_MODEL,
-                prompt=user_input,
-                size=IMG_SIZE,
-                quality=IMG_QUALITY,
-                n=1,
+            model=IMG_MODEL,
+            prompt=user_input,
+            size=IMG_SIZE,
+            quality=IMG_QUALITY,
+            n=1,
         )
 
         # get image url
@@ -116,6 +123,39 @@ class gpt:
             raise Exception("Could not save image.")
 
         return file_path
+
+    def get_vision_response(self, prompt: str, img_url: str) -> str:
+        """Returns a response from vision (text + image). Also updates the history."""
+        # get completion
+        response = self.client.chat.completions.create(
+            model=VISION_MODEL,
+            messages=[
+                {
+                    "role": "user",
+                    "content": [
+                        {"type": "text", "text": prompt},
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": img_url,
+                            },
+                        },
+                    ],
+                }
+            ],
+        )
+
+        # extract content from completion
+        response_content = response.choices[0].message.content
+
+        # add interaction to history
+        self.history.append({"role": "user", "content": prompt})
+        self.history.append({"role": "assistant", "content": response_content})
+
+        # update session usage
+        self.usage += response.usage.total_tokens * VISION_PRICING_RATE
+
+        return response_content
 
     def append_system_prompt(self, new_system_prompt: str):
         """Appends a new system prompt to the history."""
@@ -184,4 +224,10 @@ class gpt:
 if __name__ == "__main__":
     b = gpt()
     # print(b.get_text_response("tim: Hello, what is your name?"))
-    print(b.get_image_response("piccture of a cat"))
+    # print(b.get_image_response("piccture of a cat"))
+    print(
+        b.get_vision_response(
+            "what is this picture?",
+            "https://cdn.discordapp.com/attachments/1192932013548769441/1205163298891239464/20240208144840889123.png?ex=65d75ec9&is=65c4e9c9&hm=1e32dfe17ec5748bb1c6a22f5ea1313a2097561c4ed41a68638be7a3a246154a&",
+        )
+    )
