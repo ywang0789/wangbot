@@ -1,11 +1,12 @@
 """ main file for bot """
+
 import api_keys
 import discord
 from discord.ext import commands
 import gpt
 import voice
 import datetime
-
+import re
 
 # bot setup
 TOKEN = api_keys.discord_token
@@ -203,27 +204,50 @@ async def hi_command(ctx):
 async def wangbot_command(ctx, *, message: str):
     """Get text response from Wangbot GPT."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
-    
-    # format message for GPT prompt + history
-    message = ctx.author.display_name + ": " + message + "{some image url}"
-    
-    # check if message has attachment
-    if len(ctx.message.attachments) > 1: 
+
+    # check if message has attachments
+    if len(ctx.message.attachments) > 1:
         await ctx.send("Please only attach one image.")
-    elif len(ctx.message.attachments) == 1: # run vision gpt
+    elif len(ctx.message.attachments) == 1:  # message with one attachment
+
         # get attachment url
-        img_url = ctx.message.attachments[0].url
+        url = ctx.message.attachments[0].url
+
+        # format message for GPT prompt and history (no need for real url)
+        message = ctx.author.display_name + ": " + message + " {some image url}"
+
         try:
-            response = GPT.get_vision_response(message, img_url)
+            response = GPT.get_vision_response(message, url)
             await ctx.send(response)
         except:
             await ctx.send("Could not get image response.")
-    else: # run regular gpt
-        try:
-            response = GPT.get_text_response(message)
-            await ctx.send(response)
-        except:
-            await ctx.send("Could not get text response.")
+
+    else:  # all text message
+
+        # parse message for urls
+        # Regex stuff ..... IDK REGEX OR HOW THIS WORKS ¯\_(ツ)_/¯
+        url_pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+        urls = re.findall(url_pattern, message)
+        message = re.sub(
+            url_pattern, "{some url}", message
+        )  # replace urls with {some url}
+        # format message for GPT prompt and history
+        message = ctx.author.display_name + ": " + message
+        if len(urls) > 1:  # message with multiple urls
+            await ctx.send("Please only include one url.")
+        elif len(urls) == 1:  # message with one url
+            try:
+                response = GPT.get_vision_response(message, urls[0])
+                await ctx.send(response)
+            except:
+                await ctx.send("Could not get image response.")
+        else:  # message with no urls
+            try:
+                response = GPT.get_text_response(message)
+                await ctx.send(response)
+            except:
+                await ctx.send("Could not get text response.")
+
 
 # !wangpic
 @BOT.command(name="wangpic")
