@@ -192,6 +192,7 @@ class gpt:
         file_path = os.path.join(HISTORY_FILE_DIR, f"{file_name}.json")
         try:
             with open(file_path, "r") as file:
+                # overwrite history with new history
                 self.history = json.load(file)
         except:
             return False
@@ -226,9 +227,14 @@ if __name__ == "__main__":
     b = gpt()
     # print(b.get_text_response("tim: Hello, what is your name?"))
     # print(b.get_image_response("piccture of a cat"))
-    print(
-        b.get_vision_response(
-            "what is this picture?",
-            "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9-HNAsO8F1XNtS5q90_MUuGKBrU7NoFLs-g&usqp=CAU",
-        )
-    )
+    # print(
+    #     b.get_vision_response(
+    #         "what is this picture?",
+    #         "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcS9-HNAsO8F1XNtS5q90_MUuGKBrU7NoFLs-g&usqp=CAU",
+    #     )
+    # )
+    print(type(b.history))
+    print(b.get_history())
+    b.load_history_from("new")
+    print(type(b.history))
+    print(b.get_history())

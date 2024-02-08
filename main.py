@@ -147,7 +147,7 @@ async def help(ctx):
     )
     config_embed.add_field(
         name="!showwang",
-        value="Shows the current history (does not include system prompts).",
+        value="Shows the most recent 12 lines in current history (does not include system prompts).",
         inline=False,
     )
 
@@ -321,18 +321,21 @@ async def friendlywang_command(ctx):
 # !showwang
 @BOT.command(name="showwang")
 async def show_command(ctx):
-    """Shows the current history (does not include system prompts)."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !showwang.")
-
-    if len(GPT.get_history()) == 0:
+    """Shows the most recent 12 lines in current history (does not include system prompts)."""
+    history = GPT.get_history()
+    if len(history) == 0:
         await ctx.send("History is empty.")
         return
-
-    formatted_history = ""
-    for message in GPT.get_history():
-        formatted_history += f"{message['role']}: {message['content']}\n"
-    await ctx.send(formatted_history)
-
+    
+    embeded = discord.Embed(
+        title="History",
+        description="List of previous messages:",
+        color=0x0000FF,
+    )
+    # add fields to embed , but only the most recent 12 messages
+    for message in history[-12:]:
+        embeded.add_field(name=message["role"], value=message["content"], inline=False)
+    await ctx.send(embed=embeded)
 
 # showanglist
 @BOT.command(name="showwanglist")
