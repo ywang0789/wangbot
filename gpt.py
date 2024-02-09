@@ -75,7 +75,7 @@ class gpt:
 
         # get completion
         response = self.client.chat.completions.create(
-            model=LANG_MODEL, messages=self.history, max_tokens=100
+            model=LANG_MODEL, messages=self.history
         )
 
         # extract content from completion
@@ -150,7 +150,7 @@ class gpt:
         response = self.client.chat.completions.create(
             model=VISION_MODEL,
             messages=temp_history,
-            max_tokens=100,
+            max_tokens=150,
         )
 
         # extract content from completion
