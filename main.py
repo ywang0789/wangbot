@@ -147,7 +147,7 @@ async def help(ctx):
     )
     config_embed.add_field(
         name="!showwang",
-        value="Shows the most recent 12 lines in current history (does not include system prompts).",
+        value="Shows the most recent 8 lines in current history (does not include system prompts).",
         inline=False,
     )
 
@@ -334,7 +334,7 @@ async def friendlywang_command(ctx):
 # !showwang
 @BOT.command(name="showwang")
 async def show_command(ctx):
-    """Shows the most recent 12 lines in current history (does not include system prompts)."""
+    """Shows the most recent 8 lines in current history (does not include system prompts)."""
     history = GPT.get_history()
     if len(history) == 0:
         await ctx.send("History is empty.")
@@ -345,12 +345,12 @@ async def show_command(ctx):
         description="List of previous messages:",
         color=0x0000FF,
     )
-    # add fields to embed , but only the most recent 12 messages
-    for message in history[-12:]:
+    # add fields to embed , but only the most recent 8 messages
+    for message in history[-8:]:
         embeded.add_field(name=message["role"], value=message["content"], inline=False)
     await ctx.send(embed=embeded)
 
-# showanglist
+# showwanglist
 @BOT.command(name="showwanglist")
 async def showanglist_command(ctx):
     """Shows list of available histories to load."""
