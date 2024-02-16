@@ -147,7 +147,7 @@ async def help(ctx):
         color=0xFF0000,
     )
     config_embed.add_field(
-        name="!showwang",
+        name="!showwang <file_name>",
         value="Sends the indicated json history file.",
         inline=False,
     )
