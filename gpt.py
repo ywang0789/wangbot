@@ -53,9 +53,13 @@ class gpt:
 
         # init history for saving context
         self.history = []
+
         # set system prompt to history
         self.history.append({"role": "system", "content": CONSTANT_SYSTEM_PROMPT})
         self.history.append({"role": "system", "content": SYSTEM_PROMPT})
+
+        # load history from default file
+        self.load_history_from_default_file()
 
         # session usage
         self.usage = 0.00
@@ -83,6 +87,9 @@ class gpt:
 
         # add interaction to history
         self.history.append({"role": "assistant", "content": response_content})
+
+        # save history to default file
+        self.save_history_to_default_file()
 
         # update session usage
         self.usage += response.usage.total_tokens * TEXT_PRICING_RATE
@@ -140,7 +147,7 @@ class gpt:
                 },
             ],
         }
-        
+
         # copy history into a temp var
         # IMPORTANT: bcuz vision completion and text completion are different, they have different 'messages' param formats!!!!!
         temp_history = self.history.copy()
@@ -159,6 +166,9 @@ class gpt:
         # add interaction to history
         self.history.append({"role": "user", "content": prompt + "{image}"})
         self.history.append({"role": "assistant", "content": response_content})
+
+        # save history to default file
+        self.save_history_to_default_file()
 
         # update session usage
         self.usage += response.usage.total_tokens * VISION_PRICING_RATE
@@ -187,7 +197,7 @@ class gpt:
         file_path = os.path.join(HISTORY_FILE_DIR, f"{file_name}.json")
         try:
             with open(file_path, "w") as file:
-                json.dump(self.history, file)
+                json.dump(self.history[2:], file)
         except:
             return False
 
@@ -205,6 +215,16 @@ class gpt:
             return False
 
         return True
+
+    def save_history_to_default_file(self) -> bool:
+        """Saves the history to a default file.
+        Returns False if failed."""
+        return self.save_history_to("default")
+
+    def load_history_from_default_file(self) -> bool:
+        """Loads the history from a default file.
+        Returns False if failed."""
+        return self.load_history_from("default")
 
     def soft_reset_history(self):
         """Clears the history, except for the system prompts."""
@@ -228,36 +248,42 @@ class gpt:
     def get_history_list(self) -> list:
         """Returns list of all files in history dir."""
         return os.listdir(HISTORY_FILE_DIR)
-    
-    def summarize_history(self):
-        """ Summarize previous parts of the conversation to reduce their size."""
 
-        # extract and reformat converstaion from list 
+    def summarize_history(self):
+        """Summarize previous parts of the conversation to reduce their size."""
+
+        # extract and reformat converstaion from list
         conversation = ""
         for entry in self.history[2:]:  # Skip system prompts
             role = entry["role"]
             content = entry["content"]
             conversation += f"{role.capitalize()}: {content}\n"
 
-        # generate summary 
+        # generate summary
         summary_prompt = "Summarize the following conversation:\n" + conversation
         summary_response = self.client.chat.completions.create(
-            model=LANG_MODEL,  
+            model=LANG_MODEL,
             messages=[{"role": "system", "content": summary_prompt}],
         )
 
         # Extract summary content
         summary_content = summary_response.choices[0].message.content
 
-        # Replace the old history with summarized 
+        # Replace the old history with summarized
         self.history = self.history[:2]  # Keep the system prompts
-        self.history.append({"role": "system", "content": f"Summary of conversation so far:\n{summary_content}"})
+        self.history.append(
+            {
+                "role": "system",
+                "content": f"Summary of conversation so far:\n{summary_content}",
+            }
+        )
 
 
 if __name__ == "__main__":
     import time
+
     b = gpt()
-    
+
     # print(b.get_image_response("piccture of a cat"))
     print(
         b.get_vision_response(
@@ -268,9 +294,4 @@ if __name__ == "__main__":
     time.sleep(10)
     print(b.get_text_response("tim: Hello, what is your name?"))
 
-    print(b.get_history())
-
-    b.summarize_history()
-
-    print(b.get_history())
-    
+    print(b.get_text_response("john: Hello, what is my name?"))
