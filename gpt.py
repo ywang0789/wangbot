@@ -278,6 +278,9 @@ class gpt:
             }
         )
 
+        # save history to default file
+        self.save_history_to_default_file()
+
 
 if __name__ == "__main__":
     import time
