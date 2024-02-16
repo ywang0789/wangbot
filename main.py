@@ -8,6 +8,7 @@ import voice
 import datetime
 import re
 
+
 # bot setup
 TOKEN = api_keys.discord_token
 INTENTS = discord.Intents.default()
@@ -147,7 +148,7 @@ async def help(ctx):
     )
     config_embed.add_field(
         name="!showwang",
-        value="Shows the most recent 8 lines in current history (does not include system prompts).",
+        value="Sends the indicated json history file.",
         inline=False,
     )
 
@@ -194,9 +195,9 @@ async def help(ctx):
         inline=False,
     )
     config_embed.add_field(
-        name = "!summarizewang",
-        value = "Summarizes the history. (The entire history is passed into chat completion every prompt. So this is to keep the history from getting too long.)",
-        inline = False
+        name="!summarizewang",
+        value="Summarizes the history. (The entire history is passed into chat completion every prompt. So this is to keep the history from getting too long.)",
+        inline=False,
     )
     await ctx.send(embed=config_embed)
 
@@ -331,25 +332,6 @@ async def friendlywang_command(ctx):
     await ctx.send("Goodbye")
 
 
-# !showwang
-@BOT.command(name="showwang")
-async def show_command(ctx):
-    """Shows the most recent 8 lines in current history (does not include system prompts)."""
-    history = GPT.get_history()
-    if len(history) == 0:
-        await ctx.send("History is empty.")
-        return
-    
-    embeded = discord.Embed(
-        title="History",
-        description="List of previous messages:",
-        color=0x0000FF,
-    )
-    # add fields to embed , but only the most recent 8 messages
-    for message in history[-8:]:
-        embeded.add_field(name=message["role"], value=message["content"], inline=False)
-    await ctx.send(embed=embeded)
-
 # showwanglist
 @BOT.command(name="showwanglist")
 async def showanglist_command(ctx):
@@ -384,11 +366,30 @@ async def overwritewang_command(ctx, *, message: str):
     await ctx.send("System prompt overwritten.")
 
 
+# !showwang
+@BOT.command(name="showwang")
+async def show_command(ctx, *, file_name: str = ""):
+    """Sends the indicated json history file."""
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !showwang {file_name}")
+
+    # check if file name is valid
+    if len(file_name) == 0 or len(file_name) > 10:
+        await ctx.send("Please enter a new file name (< 10 chars).")
+        return
+
+    # send history
+    try:
+        file_path = GPT.get_history_file_path(file_name)
+        await ctx.send(file=discord.File(file_path))
+    except:
+        await ctx.send(f"Could not send {file_name}.json.")
+
+
 # !savewang
 @BOT.command(name="savewang")
 async def save_command(ctx, *, file_name: str = ""):
     """Saves current history to a json file name."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !save {file_name}")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !savewang {file_name}")
 
     # check if file name is valid
     if len(file_name) == 0 or len(file_name) > 10:
@@ -408,7 +409,7 @@ async def save_command(ctx, *, file_name: str = ""):
 @BOT.command(name="loadwang")
 async def load_command(ctx, *, file_name: str = ""):
     """Loads the history from a json file name."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !load {file_name}")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !loadwang {file_name}")
 
     # check if file name is valid
     if len(file_name) == 0 or len(file_name) > 10:
@@ -428,7 +429,7 @@ async def load_command(ctx, *, file_name: str = ""):
 @BOT.command(name="softresetwang")
 async def softreset_command(ctx):
     """Resets the history (keeps initial system prompt)."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !softreset.")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !softresetwang")
     GPT.soft_reset_history()
     await ctx.send("History has been reset softly.")
 
@@ -437,7 +438,7 @@ async def softreset_command(ctx):
 @BOT.command(name="hardresetwang")
 async def hardreset_command(ctx):
     """Resets the history (sets system prompt to default)."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !hardreset.")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !hardresetwang")
     GPT.hard_reset_history()
     await ctx.send("History has been reset hardly.")
 
@@ -445,21 +446,23 @@ async def hardreset_command(ctx):
 # !atkwang
 @BOT.command(name="atkwang")
 async def atkwang_command(ctx):
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !atkwang.")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !atkwang")
     await ctx.send(ATTACK_MESSAGE)
 
 
 # !warnwang
 @BOT.command(name="warnwang")
 async def warnwang_command(ctx):
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !warnwang.")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !warnwang")
     await ctx.send(WARNING_MESSAGE)
+
 
 # !summarizewang
 @BOT.command(name="summarizewang")
 async def summarizewang_command(ctx):
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !summarizewang.")
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !summarizewang")
     GPT.summarize_history()
     await ctx.send("History summarized.")
+
 
 BOT.run(TOKEN)

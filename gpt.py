@@ -225,6 +225,10 @@ class gpt:
         """Loads the history from a default file.
         Returns False if failed."""
         return self.load_history_from("default")
+    
+    def get_history_file_path(self, file_name: str) -> str:
+        """Returns the file path of a history file given the file name."""    
+        return os.path.join(HISTORY_FILE_DIR, f"{file_name}.json")
 
     def soft_reset_history(self):
         """Clears the history, except for the system prompts."""
