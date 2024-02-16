@@ -228,6 +228,30 @@ class gpt:
     def get_history_list(self) -> list:
         """Returns list of all files in history dir."""
         return os.listdir(HISTORY_FILE_DIR)
+    
+    def summarize_history(self):
+        """ Summarize previous parts of the conversation to reduce their size."""
+
+        # extract and reformat converstaion from list 
+        conversation = ""
+        for entry in self.history[2:]:  # Skip system prompts
+            role = entry["role"]
+            content = entry["content"]
+            conversation += f"{role.capitalize()}: {content}\n"
+
+        # generate summary 
+        summary_prompt = "Summarize the following conversation:\n" + conversation
+        summary_response = self.client.chat.completions.create(
+            model=LANG_MODEL,  
+            messages=[{"role": "system", "content": summary_prompt}],
+        )
+
+        # Extract summary content
+        summary_content = summary_response.choices[0].message.content
+
+        # Replace the old history with summarized 
+        self.history = self.history[:2]  # Keep the system prompts
+        self.history.append({"role": "system", "content": f"Summary of conversation so far:\n{summary_content}"})
 
 
 if __name__ == "__main__":
@@ -243,4 +267,10 @@ if __name__ == "__main__":
     )
     time.sleep(10)
     print(b.get_text_response("tim: Hello, what is your name?"))
+
+    print(b.get_history())
+
+    b.summarize_history()
+
+    print(b.get_history())
     
