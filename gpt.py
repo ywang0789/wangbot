@@ -243,7 +243,7 @@ class gpt:
     def get_history(self) -> list:
         """Returns the history.
         (does not include system prompts) :)"""
-        return self.history[2:]
+        return self.history[2:].copy()
 
     def get_history_list(self) -> list:
         """Returns list of all files in history dir."""
