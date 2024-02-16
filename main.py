@@ -188,6 +188,16 @@ async def help(ctx):
         value="Resets the history and sets system prompt to default.",
         inline=False,
     )
+    config_embed.add_field(
+        name="!removewang",
+        value="Removes all system prompts.",
+        inline=False,
+    )
+    config_embed.add_field(
+        name = "!summarizewang",
+        value = "Summarizes the history. (The entire history is passed into chat completion every prompt. So this is to keep the history from getting too long.)",
+        inline = False
+    )
     await ctx.send(embed=config_embed)
 
 
@@ -225,8 +235,11 @@ async def wangbot_command(ctx, *, message: str):
     else:  # all text message
 
         # parse message for urls
-        # Regex stuff ..... IDK REGEX OR HOW THIS WORKS ¯\_(ツ)_/¯
+
+        # Regex stuff ..... IDK REGEX DONT @ ME ¯\_(ツ)_/¯###########
         url_pattern = r"http[s]?://(?:[a-zA-Z]|[0-9]|[$-_@.&+]|[!*\\(\\),]|(?:%[0-9a-fA-F][0-9a-fA-F]))+"
+        # Regex makes me go blind ....##############################
+
         urls = re.findall(url_pattern, message)
         message = re.sub(
             url_pattern, "{some url}", message
@@ -312,7 +325,7 @@ async def usage_command(ctx):
 # !removewang
 @BOT.command(name="removewang")
 async def friendlywang_command(ctx):
-    """Remove all system prompts."""
+    """Remove all system prompts.(except first one)"""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !removewang.")
     GPT.total_reset_history()
     await ctx.send("Goodbye")
@@ -442,5 +455,11 @@ async def warnwang_command(ctx):
     print(f"{ctx.message.created_at}:{ctx.author.name}: !warnwang.")
     await ctx.send(WARNING_MESSAGE)
 
+# !summarizewang
+@BOT.command(name="summarizewang")
+async def summarizewang_command(ctx):
+    print(f"{ctx.message.created_at}:{ctx.author.name}: !summarizewang.")
+    GPT.summarize_history()
+    await ctx.send("History summarized.")
 
 BOT.run(TOKEN)
