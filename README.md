@@ -31,3 +31,11 @@ pip install -r requirements.txt
 python main.py
 ```
 
+# For ssh
+bash cmds found in `install_stuff_linux.sh`
+```
+chmod +x install_apps.sh
+sudo ./install_apps.sh
+```
+
+
