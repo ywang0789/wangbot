@@ -227,11 +227,7 @@ async def wangbot_command(ctx, *, message: str):
         # format message for GPT prompt and history (no need for real url)
         message = ctx.author.display_name + ": " + message + " {some image url}"
 
-        try:
-            response = GPT.get_vision_response(message, url)
-            await ctx.send(response)
-        except:
-            await ctx.send("Could not get image response.")
+        await ctx.send(GPT.get_vision_response(message, url))
 
     else:  # all text message
 
@@ -242,25 +238,21 @@ async def wangbot_command(ctx, *, message: str):
         # Regex makes me go blind ....##############################
 
         urls = re.findall(url_pattern, message)
+
         message = re.sub(
             url_pattern, "{some url}", message
         )  # replace urls with {some url}
+
         # format message for GPT prompt and history
         message = ctx.author.display_name + ": " + message
+
         if len(urls) > 1:  # message with multiple urls
             await ctx.send("Please only include one url.")
         elif len(urls) == 1:  # message with one url
-            try:
-                response = GPT.get_vision_response(message, urls[0])
-                await ctx.send(response)
-            except:
-                await ctx.send("Could not get image response.")
+            await ctx.send(GPT.get_vision_response(message, urls[0]))
+
         else:  # message with no urls
-            try:
-                response = GPT.get_text_response(message)
-                await ctx.send(response)
-            except:
-                await ctx.send("Could not get text response.")
+            await ctx.send(GPT.get_text_response(message))
 
 
 # !wangpic
