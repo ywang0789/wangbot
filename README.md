@@ -8,7 +8,7 @@ Requires python 3.7+
 
 ### 1. Create your own './secret/keys.json'
 
-#### key.json file structure
+#### keys.json file structure
 
 ```
 {
