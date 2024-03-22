@@ -215,11 +215,11 @@ async def hi_command(ctx):
 async def wangbot_command(ctx, *, message: str):
     """Get text response from Wangbot GPT."""
     print(f"{ctx.message.created_at}:{ctx.author.name}: !wangbot {message}")
-
+    attachment_count = int(ctx.message.attachments)
     # check if message has attachments
-    if len(ctx.message.attachments) > 1:
+    if attachment_count > 1:
         await ctx.send("Please only attach one image.")
-    elif len(ctx.message.attachments) == 1:  # message with one attachment
+    elif attachment_count == 1:  # message with one attachment
 
         # get attachment url
         url = ctx.message.attachments[0].url
@@ -246,11 +246,11 @@ async def wangbot_command(ctx, *, message: str):
         # format message for GPT prompt and history
         message = ctx.author.display_name + ": " + message
 
-        if len(urls) > 1:  # message with multiple urls
+        url_count = len(urls)
+        if url_count > 1:  # message with multiple urls
             await ctx.send("Please only include one url.")
-        elif len(urls) == 1:  # message with one url
+        elif url_count == 1:  # message with one url
             await ctx.send(GPT.get_vision_response(message, urls[0]))
-
         else:  # message with no urls
             await ctx.send(GPT.get_text_response(message))
 
