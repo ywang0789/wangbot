@@ -1,18 +1,8 @@
-
-
-
-
 /secret/*
 !/secret/.gitkeep
 
-/secret/voices/*
-!/secret/voices/.gitkeep
-
 /secret/images/*
 !/secret/images/.gitkeep
-
-/secret/histories/*
-!/secret/histories/.gitkeep
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
