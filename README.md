@@ -3,14 +3,14 @@
 ## Installation
 Requires python 3.7+
 
-### 1. Create your own './secret/keys.json'
+### 1. Create your own './secret/keys.py'
 
 #### keys.json file structure
 
 ```
 {
-    "gpt_api_key": "asbasd",
-    "discord_token": "asdasdasd"
+    OPENAI_API_KEY = asdf
+    OPENAI_API_KEY = xczbv
 }
 
 ```
