@@ -8,7 +8,6 @@ import voice
 import datetime
 import re
 
-
 # bot setup
 TOKEN = api_keys.discord_token
 INTENTS = discord.Intents.default()
@@ -82,17 +81,6 @@ async def on_message(message):
             await message.channel.send(response)
             return
 
-    # # BOT is mentioned
-    # """ responses when the bot is mentioned """
-    # if BOT.user.mentioned_in(message):
-    #     print(f"{message.created_at}:{message.author.name}: mention: {message.content}")
-    #     gpt_message = (
-    #         message.author.display_name + ": " + message.content
-    #     )  # format message for prompt
-    #     response = GPT.get_text_response(gpt_message)
-    #     await message.channel.send(response)
-    #     return
-
     await BOT.process_commands(message)
 
 
@@ -115,11 +103,6 @@ async def help(ctx):
     main_embed.add_field(
         name="!wangpic <message>",
         value="Generate image from a prompt. (Now uploads the img instead of sending url)",
-        inline=False,
-    )
-    main_embed.add_field(
-        name="!wangspeak <message>",
-        value="Generate voice from a prompt.",
         inline=False,
     )
     main_embed.add_field(
@@ -266,25 +249,6 @@ async def wangimg_command(ctx, *, message: str):
         await ctx.send(file=discord.File(file_path))
     except:
         await ctx.send("Could not generate image.")
-
-
-# !wangspeak
-@BOT.command(name="wangspeak")
-async def wangspeak_command(ctx, *, message: str = ""):
-    """Generate voice from a prompt."""
-    print(f"{ctx.message.created_at}:{ctx.author.name}: !wangspeak {message}")
-
-    # validate message
-    if len(message) == 0:
-        await ctx.send("Please enter a message.")
-        return
-
-    try:
-        file_path = voice.get_speech(message)
-        await ctx.send(file=discord.File(file_path))
-    except:
-        await ctx.send("Could not generate speech.")
-
 
 # !wanginfo
 @BOT.command(name="wanginfo")

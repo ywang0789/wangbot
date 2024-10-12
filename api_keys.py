@@ -1,4 +1,5 @@
-""" This file contains the API keys """
+# Contains API keys and tokens for services used
+
 import json
 
 with open("secret/keys.json", "r") as file:
