@@ -5,13 +5,13 @@ Requires python 3.7+
 
 ### 1. Create your own './secret/keys.py'
 
-#### keys.json file structure
+#### keys.py file structure
 
 ```
-{
-    OPENAI_API_KEY = asdf
-    OPENAI_API_KEY = xczbv
-}
+
+OPENAI_API_KEY = asdf
+OPENAI_API_KEY = xczbv
+
 
 ```
 
