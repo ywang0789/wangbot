@@ -123,7 +123,6 @@ class WangBot(commands.Bot):
 
         if message.channel.id == CHANNEL_ID:
             content = message.content.strip().lower()
-            print(type(content))
             if content.startswith("+") or content.startswith("-"):
                 try:
                     reply = self.credit_manager.process_transaction_message(content)
