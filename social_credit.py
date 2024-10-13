@@ -30,6 +30,10 @@ class CreditManager:
         self, sign: str, amount: int, user: str, reason: str, time: str
     ) -> None:
         """Performs a transaction on a user from values AND updates file"""
+        # fk off justin
+        if amount > 42069:
+            raise ValueError("Justin please stahp")
+
         if user not in self.social_credit_scores:
             raise ValueError("User not found")
         if sign == "+":
