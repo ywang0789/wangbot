@@ -53,7 +53,7 @@ class WangBot(commands.Bot):
                 await interaction.followup.send(f"Coud not generate image: {e}")
 
         @self.tree.command(
-            name="credit",
+            name="get_credit",
             description="Get a user's social credit score",
             guild=GUILD,
         )
@@ -74,7 +74,7 @@ class WangBot(commands.Bot):
             await interaction.followup.send(embed=embed)
 
         @self.tree.command(
-            name="history",
+            name="get_credit_history",
             description="Get a user's social credit score history",
             guild=GUILD,
         )
@@ -95,7 +95,7 @@ class WangBot(commands.Bot):
             await interaction.followup.send(embed=embed)
 
         @self.tree.command(
-            name="credit_all",
+            name="get_credit_all",
             description="Get all users' social credit scores",
             guild=GUILD,
         )
