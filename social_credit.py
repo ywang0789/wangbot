@@ -2,7 +2,7 @@ import datetime
 import json
 import re
 
-SOCIAL_CREDIT_FILE_PATH = ".\secret\credit_score.json"
+SOCIAL_CREDIT_FILE_PATH = "./secret/credit_score.json"
 
 REGEX_PATTERN = r"([+-])(\d+)\s+(\w+)\W(.*)"
 
