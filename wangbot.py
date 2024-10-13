@@ -30,12 +30,6 @@ class WangBot(commands.Bot):
         self.dalle = DallE()
 
         # COMMANDS
-        @self.tree.command(name="hi", description="Says hello", guild=GUILD)
-        async def say_hello(interaction: discord.Interaction):
-            await interaction.response.send_message(
-                f"Hello, {interaction.user.display_name}!"
-            )
-
         @self.tree.command(
             name="wangpic",
             description="Generates an image with prompt",
