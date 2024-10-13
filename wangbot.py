@@ -95,7 +95,7 @@ class WangBot(commands.Bot):
             await interaction.followup.send(embed=embed)
 
         @self.tree.command(
-            name="creditALL",
+            name="credit_all",
             description="Get all users' social credit scores",
             guild=GUILD,
         )
