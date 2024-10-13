@@ -2,8 +2,17 @@ import discord
 from discord.ext import commands
 
 from dall_e import DallE
+from social_credit import CreditManager
 
-DEV_GUILD = discord.Object(id=1199749859050270750)  # ID of server to sync commands
+# DEV_GUILD = discord.Object(id=1199749859050270750)
+# DEV_CHANNEL_ID = 1295035228255027281
+
+# PROD_GUILD = discord.Object(id=1094705369797898380)
+# PROD_SOCIAL_CREDIT_CHANNEL_ID = 1230908894080012298
+
+GUILD = discord.Object(id=1094705369797898380)
+
+CHANNEL_ID = 1230908894080012298
 
 
 class WangBot(commands.Bot):
@@ -14,11 +23,14 @@ class WangBot(commands.Bot):
         intents.members = True
         super().__init__(command_prefix="!", intents=intents, help_command=None)
 
+        # social credit manager
+        self.credit_manager = CreditManager()
+
         # DallE image gen
         self.dalle = DallE()
 
         # COMMANDS
-        @self.tree.command(name="hi", description="Says hello", guild=DEV_GUILD)
+        @self.tree.command(name="hi", description="Says hello", guild=GUILD)
         async def say_hello(interaction: discord.Interaction):
             await interaction.response.send_message(
                 f"Hello, {interaction.user.display_name}!"
@@ -27,7 +39,7 @@ class WangBot(commands.Bot):
         @self.tree.command(
             name="wangpic",
             description="Generates an image with prompt",
-            guild=DEV_GUILD,
+            guild=GUILD,
         )
         async def generate_image(interaction: discord.Interaction, prompt: str):
             try:
@@ -40,11 +52,73 @@ class WangBot(commands.Bot):
             except Exception as e:
                 await interaction.followup.send(f"Coud not generate image: {e}")
 
+        @self.tree.command(
+            name="credit",
+            description="Get a user's social credit score",
+            guild=GUILD,
+        )
+        async def get_credit(interaction: discord.Interaction, user: str):
+            try:
+                await interaction.response.defer()
+
+                if user:
+                    reply = self.credit_manager.get_user_score(user)
+
+            except Exception as e:
+                reply = f"Failed to get score: {e}"
+
+            embed = discord.Embed(
+                title="Social Credit Score", description=reply, color=0xFF0000
+            )
+
+            await interaction.followup.send(embed=embed)
+
+        @self.tree.command(
+            name="history",
+            description="Get a user's social credit score history",
+            guild=GUILD,
+        )
+        async def get_history(interaction: discord.Interaction, user: str):
+            try:
+                await interaction.response.defer()
+
+                if user:
+                    reply = self.credit_manager.get_formated_user_history(user)
+
+            except Exception as e:
+                reply = f"Failed to get history: {e}"
+
+            embed = discord.Embed(
+                title="Social Credit History", description=reply, color=0xFF0000
+            )
+
+            await interaction.followup.send(embed=embed)
+
+        @self.tree.command(
+            name="creditALL",
+            description="Get all users' social credit scores",
+            guild=GUILD,
+        )
+        async def get_all_credit_scores(interaction: discord.Interaction):
+            try:
+                await interaction.response.defer()
+
+                reply = self.credit_manager.get_formated_all_scores()
+
+            except Exception as e:
+                reply = f"Failed to get scores: {e}"
+
+            embed = discord.Embed(
+                title="Social Credit Scores", description=reply, color=0xFF0000
+            )
+
+            await interaction.followup.send(embed=embed)
+
     async def on_ready(self) -> None:
         print(f"{self.user} has connected!")
         # sync commands with server
         try:
-            synced = await self.tree.sync(guild=DEV_GUILD)
+            synced = await self.tree.sync(guild=GUILD)
             print(f"Synced {len(synced)} commands")
         except Exception as e:
             print(f"Failed to sync: {e}")
@@ -52,3 +126,19 @@ class WangBot(commands.Bot):
     async def on_message(self, message) -> None:
         if message.author == self.user:
             return
+
+        if message.channel.id == CHANNEL_ID:
+            content = message.content.strip().lower()
+            print(type(content))
+            if content.startswith("+") or content.startswith("-"):
+                try:
+                    reply = self.credit_manager.process_transaction_message(content)
+
+                except Exception as e:
+                    reply = f"Failed to process transaction: {e}"
+
+                embed = discord.Embed(
+                    title="Social Credit Update", description=reply, color=0xFF0000
+                )
+
+                await message.channel.send(embed=embed)
