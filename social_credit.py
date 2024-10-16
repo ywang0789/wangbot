@@ -4,7 +4,7 @@ import re
 
 SOCIAL_CREDIT_FILE_PATH = "./secret/credit_score.json"
 
-REGEX_PATTERN = r"([+-])(\d+)\s+(\w+)\W(.*)"
+REGEX_PATTERN = r"([+-])\s*(\d+)\s+(\w+)\W(.*)"
 
 
 class CreditManager:
