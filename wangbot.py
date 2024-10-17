@@ -24,10 +24,10 @@ class WangBot(commands.Bot):
         super().__init__(command_prefix="!", intents=intents, help_command=None)
 
         # social credit manager
-        self.credit_manager = CreditManager()
+        self._credit_manager = CreditManager()
 
         # DallE image gen
-        self.dalle = DallE()
+        self._dalle = DallE()
 
         # COMMANDS
         @self.tree.command(
@@ -35,11 +35,11 @@ class WangBot(commands.Bot):
             description="Generates an image with prompt",
             guild=GUILD,
         )
-        async def generate_image(interaction: discord.Interaction, prompt: str):
+        async def _generate_image(interaction: discord.Interaction, prompt: str):
             try:
                 await interaction.response.defer()
 
-                image_path = self.dalle.get_img_response(prompt)
+                image_path = self._dalle.generate_image(prompt)
                 await interaction.followup.send(
                     "Here:", files=[discord.File(image_path)]
                 )
@@ -51,12 +51,12 @@ class WangBot(commands.Bot):
             description="Get a user's social credit score",
             guild=GUILD,
         )
-        async def get_credit(interaction: discord.Interaction, user: str):
+        async def _get_credit(interaction: discord.Interaction, user: str):
             try:
                 await interaction.response.defer()
 
                 if user:
-                    reply = self.credit_manager.get_user_score(user)
+                    reply = self._credit_manager.get_user_score(user)
 
             except Exception as e:
                 reply = f"Failed to get score: {e}"
@@ -72,12 +72,12 @@ class WangBot(commands.Bot):
             description="Get a user's social credit score history",
             guild=GUILD,
         )
-        async def get_history(interaction: discord.Interaction, user: str):
+        async def _get_history(interaction: discord.Interaction, user: str):
             try:
                 await interaction.response.defer()
 
                 if user:
-                    reply = self.credit_manager.get_formated_user_history(user)
+                    reply = self._credit_manager.get_formated_user_history(user)
 
             except Exception as e:
                 reply = f"Failed to get history: {e}"
@@ -93,11 +93,11 @@ class WangBot(commands.Bot):
             description="Get all users' social credit scores",
             guild=GUILD,
         )
-        async def get_all_credit_scores(interaction: discord.Interaction):
+        async def _get_all_credit_scores(interaction: discord.Interaction):
             try:
                 await interaction.response.defer()
 
-                reply = self.credit_manager.get_formated_all_scores()
+                reply = self._credit_manager.get_formated_all_scores()
 
             except Exception as e:
                 reply = f"Failed to get scores: {e}"
@@ -125,7 +125,7 @@ class WangBot(commands.Bot):
             content = message.content.strip().lower()
             if content.startswith("+") or content.startswith("-"):
                 try:
-                    reply = self.credit_manager.process_transaction_message(content)
+                    reply = self._credit_manager.process_transaction_message(content)
 
                 except Exception as e:
                     reply = f"Failed to process transaction: {e}"

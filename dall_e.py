@@ -1,7 +1,7 @@
 import os
 
-import openai
 import requests
+from openai import OpenAI
 
 import utils
 from secret.keys import OPENAI_API_KEY
@@ -15,34 +15,29 @@ IMG_FILE_DIR = "./secret/images/"
 
 class DallE:
     def __init__(self):
-        self.client = openai.OpenAI(api_key=OPENAI_API_KEY)
+        self._client = OpenAI(api_key=OPENAI_API_KEY)
 
-    def get_img_response(self, user_input: str):
-        """Downloads and returns an image path of url response"""
+    def generate_image(self, user_input: str) -> str:
+        """Downloads and returns an image local path"""
 
-        # get response
-        response = self.client.images.generate(
+        # get generated image url
+        response = self._client.images.generate(
             model=IMG_MODEL,
             prompt=user_input,
             size=IMG_SIZE,
             quality=IMG_QUALITY,
             n=1,
         )
-
-        # get image url
-        image_url = response.data[0].url
-
-        # Download and save image
-        img_response = requests.get(image_url)
+        img_url = response.data[0].url
 
         # create dir is not exist
         if not os.path.exists(IMG_FILE_DIR):
             os.makedirs(IMG_FILE_DIR)
 
-        file_path = IMG_FILE_DIR + utils.get_unique_str() + ".png"
-
+        # download and save image
+        img_response = requests.get(img_url)
+        file_path = os.path.join(IMG_FILE_DIR, utils.get_unique_str() + ".png")
         try:
-            # write
             with open(file_path, "wb") as f:
                 f.write(img_response.content)
         except:
@@ -53,4 +48,4 @@ class DallE:
 
 if __name__ == "__main__":
     b = DallE()
-    print(b.get_img_response("a cute cat"))
+    print(b.generate_image("a cute cat"))
