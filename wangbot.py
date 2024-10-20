@@ -35,7 +35,9 @@ class WangBot(commands.Bot):
             description="Generates an image with prompt",
             guild=GUILD,
         )
-        async def _generate_image(interaction: discord.Interaction, prompt: str):
+        async def _generate_image(
+            interaction: discord.Interaction, prompt: str
+        ) -> None:
             try:
                 await interaction.response.defer()
 
@@ -51,7 +53,7 @@ class WangBot(commands.Bot):
             description="Get a user's social credit score",
             guild=GUILD,
         )
-        async def _get_credit(interaction: discord.Interaction, user: str):
+        async def _get_credit(interaction: discord.Interaction, user: str) -> None:
             try:
                 await interaction.response.defer()
 
@@ -72,7 +74,7 @@ class WangBot(commands.Bot):
             description="Get a user's social credit score history",
             guild=GUILD,
         )
-        async def _get_history(interaction: discord.Interaction, user: str):
+        async def _get_history(interaction: discord.Interaction, user: str) -> None:
             try:
                 await interaction.response.defer()
 
@@ -93,7 +95,7 @@ class WangBot(commands.Bot):
             description="Get all users' social credit scores",
             guild=GUILD,
         )
-        async def _get_all_credit_scores(interaction: discord.Interaction):
+        async def _get_all_credit_scores(interaction: discord.Interaction) -> None:
             try:
                 await interaction.response.defer()
 

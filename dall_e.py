@@ -17,13 +17,13 @@ class DallE:
     def __init__(self):
         self._client = OpenAI(api_key=OPENAI_API_KEY)
 
-    def generate_image(self, user_input: str) -> str:
+    def generate_image(self, prompt: str) -> str:
         """Downloads and returns an image local path"""
 
         # get generated image url
         response = self._client.images.generate(
             model=IMG_MODEL,
-            prompt=user_input,
+            prompt=prompt,
             size=IMG_SIZE,
             quality=IMG_QUALITY,
             n=1,

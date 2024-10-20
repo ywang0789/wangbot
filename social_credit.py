@@ -9,7 +9,7 @@ REGEX_PATTERN = r"([+-])\s*(\d+)\s+(\w+)\W(.*)"
 
 class CreditManager:
     def __init__(self):
-        self.social_credit_scores = {}
+        self._social_credit_scoress = {}
         self._load_scores()
 
     def process_transaction_message(self, message: str) -> str:
@@ -28,9 +28,9 @@ class CreditManager:
 
     def get_user_score(self, user: str) -> int:
         """returns the total score of a user"""
-        if user not in self.social_credit_scores:
+        if user not in self._social_credit_scores:
             raise ValueError("User not found")
-        return self.social_credit_scores[user]["total"]
+        return self._social_credit_scores[user]["total"]
 
     def get_formated_user_history(self, user: str) -> str:
         """returns the transaction history of a user in a formatted string"""
@@ -61,7 +61,7 @@ class CreditManager:
         if amount > 42069:
             raise ValueError("Justin please stahp")
 
-        if user not in self.social_credit_scores:
+        if user not in self._social_credit_scores:
             raise ValueError("User not found")
         if sign == "+":
             signed_amount = amount
@@ -70,11 +70,11 @@ class CreditManager:
         else:
             raise ValueError("Invalid sign")
 
-        self.social_credit_scores[user]["total"] += signed_amount
+        self._social_credit_scores[user]["total"] += signed_amount
 
         transaction = {"amount": signed_amount, "reason": reason, "timestamp": time}
 
-        self.social_credit_scores[user]["history"].append(transaction)
+        self._social_credit_scores[user]["history"].append(transaction)
 
         self._save_scores()
 
@@ -95,15 +95,15 @@ class CreditManager:
 
     def _get_user_history(self, user: str) -> list[dict]:
         """returns the transaction history of a user"""
-        if user not in self.social_credit_scores:
+        if user not in self._social_credit_scores:
             raise ValueError("User not found")
-        return self.social_credit_scores[user]["history"]
+        return self._social_credit_scores[user]["history"]
 
     def _get_all_scores(self) -> dict:
         """returns the total scores of all users"""
         scores = {}
-        for user in self.social_credit_scores:
-            scores[user] = self.social_credit_scores[user]["total"]
+        for user in self._social_credit_scores:
+            scores[user] = self._social_credit_scores[user]["total"]
 
         return scores
 
@@ -111,7 +111,7 @@ class CreditManager:
         """reads and loads social credit scores from file"""
         try:
             with open(SOCIAL_CREDIT_FILE_PATH, "r") as file:
-                self.social_credit_scores = json.load(file)
+                self._social_credit_scores = json.load(file)
         except Exception as e:
             print(f"Failed to load scores: {e}")
 
@@ -119,7 +119,7 @@ class CreditManager:
         """writes current scores to file"""
         try:
             with open(SOCIAL_CREDIT_FILE_PATH, "w") as file:
-                json.dump(self.social_credit_scores, file)
+                json.dump(self._social_credit_scores, file)
         except Exception as e:
             print(f"Failed to save scores: {e}")
 
