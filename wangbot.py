@@ -1,6 +1,7 @@
 import discord
 from discord.ext import commands
 
+from assistant import Assistant
 from dall_e import DallE
 from social_credit import CreditManager
 
@@ -11,6 +12,7 @@ from social_credit import CreditManager
 # PROD_SOCIAL_CREDIT_CHANNEL_ID = 1230908894080012298
 
 GUILD = discord.Object(id=1094705369797898380)
+GUILD_DEV = discord.Object(id=1199749859050270750)
 
 CHANNEL_ID = 1230908894080012298
 
@@ -29,7 +31,36 @@ class WangBot(commands.Bot):
         # DallE image gen
         self._dalle = DallE()
 
+        # assistant
+        self._assistant = Assistant()
+
         # COMMANDS
+        @self.tree.command(
+            name="wangbot", description="Talk to wangbot", guild=GUILD_DEV
+        )
+        async def _get_wangbot_response(
+            interaction: discord.Interaction, message: str
+        ) -> None:
+            """Get response from gpt assistant"""
+            user = interaction.user.display_name
+            try:
+                await interaction.response.defer()
+
+                response = self._assistant.get_reponse(user, message)
+
+            except Exception as e:
+                response = f"Failed to get response: {e}"
+
+            response_message = response.get("response", "No response")
+            file_path = response.get("file_path", None)
+
+            if file_path is not None:
+                await interaction.followup.send(
+                    response_message, files=[discord.File(file_path)]
+                )
+            else:
+                await interaction.followup.send(response_message)
+
         @self.tree.command(
             name="wangpic",
             description="Generates an image with prompt",
