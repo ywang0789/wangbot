@@ -35,9 +35,7 @@ class WangBot(commands.Bot):
         self._assistant = Assistant()
 
         # COMMANDS
-        @self.tree.command(
-            name="wangbot", description="Talk to wangbot", guild=GUILD_DEV
-        )
+        @self.tree.command(name="wangbot", description="Talk to wangbot", guild=GUILD)
         async def _get_wangbot_response(
             interaction: discord.Interaction, message: str
         ) -> None:
