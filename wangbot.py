@@ -1,3 +1,5 @@
+import json
+
 import discord
 from discord.ext import commands
 
@@ -46,13 +48,13 @@ class WangBot(commands.Bot):
             try:
                 await interaction.response.defer()
 
-                response = self._assistant.get_reponse(user, message)
+                response = json.loads(self._assistant.get_reponse(user, message))
 
             except Exception as e:
                 response = f"Failed to get response: {e}"
 
-            response_message = response["response"]
-            file_path = response["file_path"]
+            response_message = response.get("response")
+            file_path = response.get("file_path")
 
             if file_path and file_path is not None:
                 await interaction.followup.send(
