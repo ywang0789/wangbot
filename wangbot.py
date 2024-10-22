@@ -51,10 +51,10 @@ class WangBot(commands.Bot):
             except Exception as e:
                 response = f"Failed to get response: {e}"
 
-            response_message = response.get("response", "No response")
-            file_path = response.get("file_path", None)
+            response_message = response["response"]
+            file_path = response["file_path"]
 
-            if file_path is not None:
+            if file_path and file_path is not None:
                 await interaction.followup.send(
                     response_message, files=[discord.File(file_path)]
                 )
