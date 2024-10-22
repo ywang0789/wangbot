@@ -50,6 +50,7 @@ class Assistant:
         }
         """
 
+        print("getting assistant response")
         result = {}  # dict to store response
 
         message = self._client.beta.threads.messages.create(
@@ -110,6 +111,7 @@ class Assistant:
         response = self._client.beta.threads.messages.list(thread_id=self._thread.id)
         result["response"] = response.data[0].content[0].text.value
 
+        print("done")
         return result
 
 
