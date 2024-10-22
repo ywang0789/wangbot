@@ -47,12 +47,11 @@ class WangBot(commands.Bot):
                 await interaction.response.defer()
 
                 response = self._assistant.get_reponse(user, message)
+                response_message = response.get("response")
+                file_path = response.get("file_path")
 
             except Exception as e:
-                response = f"Failed to get response: {e}"
-
-            response_message = response.get("response")
-            file_path = response.get("file_path")
+                response_message = f"Failed to get response: {e}"
 
             if file_path and file_path is not None:
                 await interaction.followup.send(
