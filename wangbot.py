@@ -146,7 +146,9 @@ class WangBot(commands.Bot):
         # sync commands with server
         try:
             synced = await self.tree.sync(guild=GUILD)
-            print(f"Synced {len(synced)} commands")
+            synced_dev = await self.tree.sync(guild=GUILD_DEV)
+            print(f"Synced {len(synced)} commands to prod")
+            print(f"Synced {len(synced_dev)} commands to dev")
         except Exception as e:
             print(f"Failed to sync: {e}")
 
