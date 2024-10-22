@@ -108,11 +108,14 @@ class Assistant:
                 raise Exception("Run failed")
 
         response = self._client.beta.threads.messages.list(thread_id=self._thread.id)
-        result["response"] = response.data[0].content[0]
+        result["response"] = response.data[0].content[0].text.value
 
         return result
 
 
 if __name__ == "__main__":
     a = Assistant()
-    pprint(a.get_reponse("user", "a cute cat"))
+    resp = a.get_reponse("user", "a cute cat")
+    pprint(resp)
+    pprint(type(resp))
+    print(type(resp.get("response")))

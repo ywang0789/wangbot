@@ -1,5 +1,3 @@
-import json
-
 import discord
 from discord.ext import commands
 
@@ -48,7 +46,7 @@ class WangBot(commands.Bot):
             try:
                 await interaction.response.defer()
 
-                response = json.loads(self._assistant.get_reponse(user, message))
+                response = self._assistant.get_reponse(user, message)
 
             except Exception as e:
                 response = f"Failed to get response: {e}"
