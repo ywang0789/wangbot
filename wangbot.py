@@ -43,6 +43,8 @@ class WangBot(commands.Bot):
         ) -> None:
             """Get response from gpt assistant"""
             user = interaction.user.display_name
+            file_path = None
+            response_message = None
             try:
                 await interaction.response.defer()
 
@@ -53,7 +55,7 @@ class WangBot(commands.Bot):
             except Exception as e:
                 response_message = f"Failed to get response: {e}"
 
-            if file_path and file_path is not None:
+            if file_path is not None:
                 await interaction.followup.send(
                     response_message, files=[discord.File(file_path)]
                 )
