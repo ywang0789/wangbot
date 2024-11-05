@@ -1,30 +1,58 @@
 import datetime
 import json
-import re
+from pprint import pprint
+
+from transaction import Transaction
 
 SOCIAL_CREDIT_FILE_PATH = "./secret/credit_score.json"
 
-REGEX_PATTERN = r"([+-])\s*(\d+)\s+(\w+)\W(.*)"
+"""
+social scores dict format:
+{
+    "user1": 
+    {
+        "total": 123,
+        "history": 
+        [
+            {
+                "amount": 123,
+                "reason": "because cool",
+                "timestamp": "2021-08-02T14:22:27.774"
+                "author": "user2"   
+            }
+        ]
+    }
+}
+"""
 
 
 class CreditManager:
     def __init__(self):
-        self._social_credit_scoress = {}
-        self._load_scores()
+        self._social_credit_scores = {}
+        self._load_scores(SOCIAL_CREDIT_FILE_PATH)
 
-    def process_transaction_message(self, message: str) -> str:
+    def process_transaction_message(self, author: str, message: str) -> str:
         """Processes a transaction message and returns a confirmation message (ENTIRE PROCESS)"""
-        sign, amount, user, reason = self._parse_transaction_message(message)
         time = datetime.datetime.now().isoformat()
-        self._perform_transaction(sign, amount, user, reason, time)
 
         try:
-            total = self.get_user_score(user)
+            transaction = Transaction(author, time, message)
         except ValueError as e:
             return str(e)
 
-        confirmation = f"{user} is now at {total} social credit points"
-        return confirmation
+        try:
+            self._perform_transaction(transaction)
+        except ValueError as e:
+            return str(e)
+
+        try:
+            total = self.get_user_score(transaction.user)
+        except ValueError as e:
+            return str(e)
+
+        confirmation_str = f"{transaction.user} is now at {total} social credit points"
+
+        return confirmation_str
 
     def get_user_score(self, user: str) -> int:
         """returns the total score of a user"""
@@ -35,15 +63,22 @@ class CreditManager:
     def get_formated_user_history(self, user: str) -> str:
         """returns the transaction history of a user in a formatted string"""
         history = self._get_user_history(user)
-        formatted_history = ""
+        formatted_history_str = ""
         for transaction in history:
             # if amount is possitive, add a plus sign
             if transaction["amount"] > 0:
                 amount = f"+{transaction['amount']}"
             reason = transaction["reason"]
             time = transaction["timestamp"]
-            formatted_history += f"{time}: {amount} {reason}\n"
-        return formatted_history
+
+            # if no author, set to "N/A" ***because author was implemented later***
+            if "author" in transaction:
+                author = transaction["author"]
+            else:
+                author = "N/A"
+
+            formatted_history_str += f"By {author} at {time}: {amount} {reason}\n"
+        return formatted_history_str
 
     def get_formated_all_scores(self) -> str:
         """returns the total scores of all users in a formatted string"""
@@ -53,45 +88,35 @@ class CreditManager:
             formatted_scores += f"{user}: {scores[user]}\n"
         return formatted_scores
 
-    def _perform_transaction(
-        self, sign: str, amount: int, user: str, reason: str, time: str
-    ) -> None:
+    def _perform_transaction(self, transaction: Transaction) -> None:
         """Performs a transaction on a user from values AND updates file"""
+
         # fk off justin
-        if amount > 42069:
+        if transaction.amount > 42069:
             raise ValueError("Justin please stahp")
 
-        if user not in self._social_credit_scores:
+        if transaction.user not in self._social_credit_scores:
             raise ValueError("User not found")
-        if sign == "+":
-            signed_amount = amount
-        elif sign == "-":
-            signed_amount = -amount
+
+        if transaction.sign == "+":
+            signed_amount = transaction.amount
+        elif transaction.sign == "-":
+            signed_amount = -transaction.amount
         else:
             raise ValueError("Invalid sign")
 
-        self._social_credit_scores[user]["total"] += signed_amount
+        self._social_credit_scores[transaction.user]["total"] += signed_amount
 
-        transaction = {"amount": signed_amount, "reason": reason, "timestamp": time}
+        transaction_dict = {
+            "amount": signed_amount,
+            "reason": transaction.reason,
+            "timestamp": transaction.time,
+            "author": transaction.author,
+        }
 
-        self._social_credit_scores[user]["history"].append(transaction)
+        self._social_credit_scores[transaction.user]["history"].append(transaction_dict)
 
-        self._save_scores()
-
-    def _parse_transaction_message(self, message: str) -> tuple[str, int, str, str]:
-        """extracts transaction details from message"""
-        matches = re.match(REGEX_PATTERN, message)
-        sign, amount, user, reason = None, None, None, None
-        if matches:
-            sign = matches.group(1)
-            amount = int(matches.group(2))
-            user = matches.group(3)
-            reason = matches.group(4)
-
-        if not sign or not amount or not user:
-            raise ValueError("Invalid transaction message")
-
-        return sign, amount, user, reason
+        self._save_scores(SOCIAL_CREDIT_FILE_PATH)
 
     def _get_user_history(self, user: str) -> list[dict]:
         """returns the transaction history of a user"""
@@ -107,18 +132,18 @@ class CreditManager:
 
         return scores
 
-    def _load_scores(self) -> None:
+    def _load_scores(self, score_file_path: str) -> None:
         """reads and loads social credit scores from file"""
         try:
-            with open(SOCIAL_CREDIT_FILE_PATH, "r") as file:
+            with open(score_file_path, "r") as file:
                 self._social_credit_scores = json.load(file)
         except Exception as e:
             print(f"Failed to load scores: {e}")
 
-    def _save_scores(self) -> None:
+    def _save_scores(self, score_file_path: str) -> None:
         """writes current scores to file"""
         try:
-            with open(SOCIAL_CREDIT_FILE_PATH, "w") as file:
+            with open(score_file_path, "w") as file:
                 json.dump(self._social_credit_scores, file)
         except Exception as e:
             print(f"Failed to save scores: {e}")
@@ -126,13 +151,15 @@ class CreditManager:
 
 if __name__ == "__main__":
     cm = CreditManager()
-    cm._load_scores()
-    # print(cm.social_credit_scores)
+    cm._load_scores(SOCIAL_CREDIT_FILE_PATH)
+    pprint(cm._social_credit_scores)
 
-    # string = "+1 yao because cool"
+    string = "+1 yao because cool"
 
-    # text = cm.process_transaction_message(string)
+    text = cm.process_transaction_message("test", string)
 
-    # print(text)
+    print(text)
 
     print(cm.get_formated_all_scores())
+
+    print(cm.get_formated_user_history("yao"))
