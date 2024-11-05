@@ -159,7 +159,9 @@ class WangBot(commands.Bot):
             content = message.content.strip().lower()
             if content.startswith("+") or content.startswith("-"):
                 try:
-                    reply = self._credit_manager.process_transaction_message(content)
+                    reply = self._credit_manager.process_transaction_message(
+                        message.author.display_name, content
+                    )
 
                 except Exception as e:
                     reply = f"Failed to process transaction: {e}"
