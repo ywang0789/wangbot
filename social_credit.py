@@ -45,9 +45,9 @@ class CreditManager:
         """Processes a transaction message and returns a confirmation message (ENTIRE PROCESS)"""
         time = datetime.datetime.now().isoformat()
 
-        # find arthor name from MESSAGE ID MAP
+        # find arthor name from ID MAP
         if author_id not in ID_TO_NAME_MAP:
-            raise ValueError("User ID not registered in ID_TO_NAME_MAP")
+            raise ValueError(f"User ID not registered in ID_TO_NAME_MAP: {author_id}")
 
         author_name = ID_TO_NAME_MAP[author_id]
 
