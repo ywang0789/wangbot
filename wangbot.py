@@ -151,16 +151,16 @@ class WangBot(commands.Bot):
         except Exception as e:
             print(f"Failed to sync: {e}")
 
-    async def on_message(self, message) -> None:
-        if message.author == self.user:
+    async def on_message(self, msg) -> None:
+        if msg.author == self.user:
             return
 
-        if message.channel.id == CHANNEL_ID:
-            content = message.content.strip().lower()
-            if content.startswith("+") or content.startswith("-"):
+        if msg.channel.id == CHANNEL_ID:
+            msg_content = msg.content.strip().lower()
+            if msg_content.startswith("+") or msg_content.startswith("-"):
                 try:
                     reply = self._credit_manager.process_transaction_message(
-                        message.author.display_name, content
+                        msg.author.id, msg_content
                     )
 
                 except Exception as e:
@@ -170,4 +170,4 @@ class WangBot(commands.Bot):
                     title="Social Credit Update", description=reply, color=0xFF0000
                 )
 
-                await message.channel.send(embed=embed)
+                await msg.channel.send(embed=embed)

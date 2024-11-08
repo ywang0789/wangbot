@@ -5,18 +5,18 @@ REGEX_PATTERN = r"([+-])\s*(\d+)\s+(\w+)\W?(.*)?"  # group 1: sign, group 2: amo
 
 
 class Transaction:
-    def __init__(self, author, time, sign, amount, user, reason):
-        self.author = author
+    def __init__(self, author_name, time, sign, amount, user, reason):
+        self.author = author_name
         self.time = time
         self.sign = sign
         self.amount = amount
         self.user = user
         self.reason = reason
 
-    def __init__(self, author: str, time: datetime, transaction_str: str):
+    def __init__(self, author_name: str, time: datetime, transaction_str: str):
         """extracts transaction details from message and creates transaction object"""
 
-        self.author = author
+        self.author = author_name
         self.time = time
 
         matches = re.match(REGEX_PATTERN, transaction_str)

@@ -6,6 +6,16 @@ from transaction import Transaction
 
 SOCIAL_CREDIT_FILE_PATH = "./secret/credit_score.json"
 
+ID_TO_NAME_MAP = {
+    "458669853851648022": "yao",
+    "521120580205019137": "justin",
+    "269937096884617226": "sean",
+    "267135189996535810": "bowen",
+    "155889720885379073": "nic",
+    "155889720885379073": "brad",
+    "376081657029066756": "ethan",
+}
+
 """
 social scores dict format:
 {
@@ -31,14 +41,24 @@ class CreditManager:
         self._social_credit_scores = {}
         self._load_scores(SOCIAL_CREDIT_FILE_PATH)
 
-    def process_transaction_message(self, author: str, message: str) -> str:
+    def process_transaction_message(self, author_id: str, message: str) -> str:
         """Processes a transaction message and returns a confirmation message (ENTIRE PROCESS)"""
         time = datetime.datetime.now().isoformat()
 
+        # find arthor name from MESSAGE ID MAP
+        if author_id not in ID_TO_NAME_MAP:
+            raise ValueError("User ID not registered in ID_TO_NAME_MAP")
+
+        author_name = ID_TO_NAME_MAP[author_id]
+
         try:
-            transaction = Transaction(author, time, message)
+            transaction = Transaction(author_name, time, message)
         except ValueError as e:
             return str(e)
+
+        # cannot perform transaction on self
+        if author_name == transaction.user:
+            raise ValueError(f"Cannot perform transaction on yourself {author_name}")
 
         try:
             self._perform_transaction(transaction)
@@ -147,19 +167,3 @@ class CreditManager:
                 json.dump(self._social_credit_scores, file)
         except Exception as e:
             print(f"Failed to save scores: {e}")
-
-
-if __name__ == "__main__":
-    cm = CreditManager()
-    cm._load_scores(SOCIAL_CREDIT_FILE_PATH)
-    pprint(cm._social_credit_scores)
-
-    string = "+1 yao because cool"
-
-    text = cm.process_transaction_message("test", string)
-
-    print(text)
-
-    print(cm.get_formated_all_scores())
-
-    print(cm.get_formated_user_history("yao"))
