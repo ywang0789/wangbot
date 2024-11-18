@@ -73,7 +73,7 @@ class WangBot(commands.Bot):
 
                 image_path = self._dalle.generate_image(prompt)
                 await interaction.followup.send(
-                    f"Prompt:{prompt}", files=[discord.File(image_path)]
+                    f"Prompt: {prompt}", files=[discord.File(image_path)]
                 )
             except Exception as e:
                 await interaction.followup.send(f"Coud not generate image: {e}")
