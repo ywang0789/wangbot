@@ -146,10 +146,15 @@ class WangBot(commands.Bot):
         async def _add_naughty(
             interaction: discord.Interaction, user_name: str
         ) -> None:
+
+            author_id = str(interaction.user.id)
+
             try:
                 await interaction.response.defer()
 
-                reply = self._naughty_list.get_add_user_name_message(user_name)
+                reply = self._naughty_list.get_add_user_name_message(
+                    author_id, user_name
+                )
 
             except Exception as e:
                 reply = f"Failed to add to naughty list: {e}"
@@ -168,16 +173,39 @@ class WangBot(commands.Bot):
         async def _remove_naughty(
             interaction: discord.Interaction, user_name: str
         ) -> None:
+            author_id = str(interaction.user.id)
             try:
                 await interaction.response.defer()
 
-                reply = self._naughty_list.get_remove_user_name_message(user_name)
+                reply = self._naughty_list.get_remove_user_name_message(
+                    author_id, user_name
+                )
 
             except Exception as e:
                 reply = f"Failed to remove from naughty list: {e}"
 
             embed = discord.Embed(
                 title="Naughty List Update", description=reply, color=0xFF0000
+            )
+
+            await interaction.followup.send(embed=embed)
+
+        @self.tree.command(
+            name="naughty_list",
+            description="Get the naughty list",
+            guild=GUILD,
+        )
+        async def _get_naughty_list(interaction: discord.Interaction) -> None:
+            try:
+                await interaction.response.defer()
+
+                reply = self._naughty_list.get_formatted_list()
+
+            except Exception as e:
+                reply = f"Failed to get naughty list: {e}"
+
+            embed = discord.Embed(
+                title="Naughty List", description=reply, color=0xFF0000
             )
 
             await interaction.followup.send(embed=embed)
@@ -198,13 +226,13 @@ class WangBot(commands.Bot):
         if msg.channel.id == CHANNEL_ID:
             msg_content = msg.content.strip().lower()
             if msg_content.startswith("+") or msg_content.startswith("-"):
-                auther_id = str(msg.author.id)
+                author_id = str(msg.author.id)
                 reply = None
-                if not self._naughty_list.is_user_id_list(auther_id):
+                if not self._naughty_list.is_user_id_list(author_id):
 
                     try:
                         reply = self._credit_manager.process_transaction_message(
-                            auther_id, msg_content
+                            author_id, msg_content
                         )
 
                     except Exception as e:

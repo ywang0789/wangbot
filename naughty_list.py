@@ -8,6 +8,7 @@ class NaughtyList:
         self._naughty_list = []  # only store user_ids
 
     def _add_user_name_to_list(self, user_name: str) -> None:
+
         if user_name not in NAME_TO_ID_MAP:
             raise ValueError(f"{user_name} not found in NAME_TO_ID_MAP")
 
@@ -18,7 +19,11 @@ class NaughtyList:
 
         self._naughty_list.append(user_id)
 
-    def get_add_user_name_message(self, user_name: str) -> str:
+    def get_add_user_name_message(self, author_id: str, user_name: str) -> str:
+
+        if author_id not in ID_TO_NAME_MAP:
+            return f"Thou dost not hath rights"
+
         try:
             self._add_user_name_to_list(user_name)
         except ValueError as e:
@@ -37,7 +42,15 @@ class NaughtyList:
 
         self._naughty_list.remove(user_id)
 
-    def get_remove_user_name_message(self, user_name: str) -> str:
+    def get_remove_user_name_message(self, author_id: str, user_name: str) -> str:
+
+        if author_id not in ID_TO_NAME_MAP:
+            return f"Thou dost not hath rights"
+
+        author_name = ID_TO_NAME_MAP[author_id]
+        if author_name == user_name:
+            return f"{author_name}, You cannot remove yourself from the naughty list"
+
         try:
             self._remove_user_name_from_list(user_name)
         except ValueError as e:
@@ -50,3 +63,10 @@ class NaughtyList:
 
     def is_user_id_list(self, user_id: str) -> bool:
         return user_id in self._naughty_list
+
+
+if __name__ == "__main__":
+    naughty_list = NaughtyList()
+    print(naughty_list.get_add_user_name_message("458669853851648022", "yao"))
+    print(naughty_list.get_add_user_name_message("458669853851648022", "justin"))
+    print(naughty_list.get_add_user_name_message("458669853851648022", "justin"))
