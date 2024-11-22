@@ -63,10 +63,3 @@ class NaughtyList:
 
     def is_user_id_list(self, user_id: str) -> bool:
         return user_id in self._naughty_list
-
-
-if __name__ == "__main__":
-    naughty_list = NaughtyList()
-    print(naughty_list.get_add_user_name_message("458669853851648022", "yao"))
-    print(naughty_list.get_add_user_name_message("458669853851648022", "justin"))
-    print(naughty_list.get_add_user_name_message("458669853851648022", "justin"))
