@@ -21,6 +21,7 @@ class NaughtyList:
 
     def get_add_user_name_message(self, author_id: str, user_name: str) -> str:
 
+        user_name = user_name.lower()
         if author_id not in ID_TO_NAME_MAP:
             return f"Thou dost not hath rights"
 
@@ -44,6 +45,7 @@ class NaughtyList:
 
     def get_remove_user_name_message(self, author_id: str, user_name: str) -> str:
 
+        user_name = user_name.lower()
         if author_id not in ID_TO_NAME_MAP:
             return f"Thou dost not hath rights"
 

@@ -68,12 +68,14 @@ class CreditManager:
 
     def get_user_score(self, user: str) -> int:
         """returns the total score of a user"""
+        user = user.lower()
         if user not in self._social_credit_scores:
             raise ValueError("User not found")
         return self._social_credit_scores[user]["total"]
 
     def get_formated_user_history(self, user: str) -> str:
         """returns the transaction history of a user in a formatted string"""
+        user = user.lower()
         history = self._get_user_history(user)
         formatted_history_str = ""
         for transaction in history:
