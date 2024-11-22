@@ -4,7 +4,7 @@ import requests
 from openai import OpenAI
 
 import utils
-from secret.keys import OPENAI_API_KEY
+from secret.secret import OPENAI_API_KEY
 
 # image model settings
 IMG_MODEL = "dall-e-3"

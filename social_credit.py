@@ -2,19 +2,11 @@ import datetime
 import json
 from pprint import pprint
 
+from secret.secret import ID_TO_NAME_MAP
 from transaction import Transaction
 
 SOCIAL_CREDIT_FILE_PATH = "./secret/credit_score.json"
 
-ID_TO_NAME_MAP = {
-    "458669853851648022": "yao",
-    "521120580205019137": "justin",
-    "269937096884617226": "sean",
-    "267135189996535810": "bowen",
-    "155889720885379073": "nic",
-    "155889720885379073": "brad",
-    "376081657029066756": "ethan",
-}
 
 """
 social scores dict format:
@@ -116,7 +108,7 @@ class CreditManager:
             raise ValueError("Justin please stahp")
 
         if transaction.user not in self._social_credit_scores:
-            raise ValueError("User not found")
+            raise ValueError(f"User not found: {transaction.user}")
 
         if transaction.sign == "+":
             signed_amount = transaction.amount
@@ -136,6 +128,7 @@ class CreditManager:
 
         self._social_credit_scores[transaction.user]["history"].append(transaction_dict)
 
+        self._sort_scores()
         self._save_scores(SOCIAL_CREDIT_FILE_PATH)
 
     def _get_user_history(self, user: str) -> list[dict]:
@@ -167,3 +160,13 @@ class CreditManager:
                 json.dump(self._social_credit_scores, file)
         except Exception as e:
             print(f"Failed to save scores: {e}")
+
+    def _sort_scores(self):
+        """sorte scores by total score from highest to lowest"""
+        self._social_credit_scores = dict(
+            sorted(
+                self._social_credit_scores.items(),
+                key=lambda item: item[1]["total"],
+                reverse=True,
+            )
+        )

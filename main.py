@@ -1,4 +1,4 @@
-from secret.keys import DISCORD_TOKEN
+from secret.secret import DISCORD_TOKEN
 from wangbot import WangBot
 
 

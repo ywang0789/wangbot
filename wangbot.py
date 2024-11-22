@@ -3,18 +3,12 @@ from discord.ext import commands
 
 from assistant import Assistant
 from dall_e import DallE
+from secret.secret import DISCORD_CREDIT_CHANNEL_ID, DISCORD_GUILD_ID
 from social_credit import CreditManager
 
-# DEV_GUILD = discord.Object(id=1199749859050270750)
-# DEV_CHANNEL_ID = 1295035228255027281
+GUILD = discord.Object(id=DISCORD_GUILD_ID)
 
-# PROD_GUILD = discord.Object(id=1094705369797898380)
-# PROD_SOCIAL_CREDIT_CHANNEL_ID = 1230908894080012298
-
-GUILD = discord.Object(id=1094705369797898380)
-GUILD_DEV = discord.Object(id=1199749859050270750)
-
-CHANNEL_ID = 1230908894080012298
+CHANNEL_ID = DISCORD_CREDIT_CHANNEL_ID
 
 
 class WangBot(commands.Bot):
@@ -145,9 +139,7 @@ class WangBot(commands.Bot):
         # sync commands with server
         try:
             synced = await self.tree.sync(guild=GUILD)
-            synced_dev = await self.tree.sync(guild=GUILD_DEV)
             print(f"Synced {len(synced)} commands to prod")
-            print(f"Synced {len(synced_dev)} commands to dev")
         except Exception as e:
             print(f"Failed to sync: {e}")
 

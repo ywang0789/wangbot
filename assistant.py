@@ -5,7 +5,7 @@ from pprint import pprint
 from openai import OpenAI
 
 from dall_e import DallE
-from secret.keys import OPENAI_API_KEY
+from secret.secret import OPENAI_API_KEY
 
 ASSISTANT_ID = "asst_PNgJ8gWduFNFrjv819CYJZWG"
 
