@@ -3,6 +3,7 @@ from discord.ext import commands
 
 from assistant import Assistant
 from dall_e import DallE
+from naughty_list import NaughtyList
 from secret.secret import DISCORD_CREDIT_CHANNEL_ID, DISCORD_GUILD_ID
 from social_credit import CreditManager
 
@@ -27,6 +28,9 @@ class WangBot(commands.Bot):
 
         # assistant
         self._assistant = Assistant()
+
+        # naughty list
+        self._naughty_list = NaughtyList()
 
         # COMMANDS
         @self.tree.command(name="wangbot", description="Talk to wangbot", guild=GUILD)
@@ -134,6 +138,50 @@ class WangBot(commands.Bot):
 
             await interaction.followup.send(embed=embed)
 
+        @self.tree.command(
+            name="naughty",
+            description="Add a user to the naughty list",
+            guild=GUILD,
+        )
+        async def _add_naughty(
+            interaction: discord.Interaction, user_name: str
+        ) -> None:
+            try:
+                await interaction.response.defer()
+
+                reply = self._naughty_list.get_add_user_name_message(user_name)
+
+            except Exception as e:
+                reply = f"Failed to add to naughty list: {e}"
+
+            embed = discord.Embed(
+                title="Naughty List Update", description=reply, color=0xFF0000
+            )
+
+            await interaction.followup.send(embed=embed)
+
+        @self.tree.command(
+            name="not_naughty",
+            description="Remove a user from the naughty list",
+            guild=GUILD,
+        )
+        async def _remove_naughty(
+            interaction: discord.Interaction, user_name: str
+        ) -> None:
+            try:
+                await interaction.response.defer()
+
+                reply = self._naughty_list.get_remove_user_name_message(user_name)
+
+            except Exception as e:
+                reply = f"Failed to remove from naughty list: {e}"
+
+            embed = discord.Embed(
+                title="Naughty List Update", description=reply, color=0xFF0000
+            )
+
+            await interaction.followup.send(embed=embed)
+
     async def on_ready(self) -> None:
         print(f"{self.user} has connected!")
         # sync commands with server
@@ -150,13 +198,20 @@ class WangBot(commands.Bot):
         if msg.channel.id == CHANNEL_ID:
             msg_content = msg.content.strip().lower()
             if msg_content.startswith("+") or msg_content.startswith("-"):
-                try:
-                    reply = self._credit_manager.process_transaction_message(
-                        str(msg.author.id), msg_content
-                    )
+                auther_id = str(msg.author.id)
+                reply = None
+                if not self._naughty_list.is_user_id_list(auther_id):
 
-                except Exception as e:
-                    reply = f"Failed to process transaction: {e}"
+                    try:
+                        reply = self._credit_manager.process_transaction_message(
+                            auther_id, msg_content
+                        )
+
+                    except Exception as e:
+                        reply = f"Failed to process transaction: {e}"
+
+                else:
+                    reply = f"Sorry {msg.author.display_name}, you are on the naughty list :("
 
                 embed = discord.Embed(
                     title="Social Credit Update", description=reply, color=0xFF0000
