@@ -225,7 +225,7 @@ class WangBot(commands.Bot):
 
         if msg.channel.id == CHANNEL_ID:
             msg_content = msg.content.strip().lower()
-            if msg_content.startswith("+") or msg_content.startswith("-"):
+            if msg_content.startswith("+"):
                 author_id = str(msg.author.id)
                 reply = None
                 if not self._naughty_list.is_user_id_list(author_id):
@@ -237,6 +237,8 @@ class WangBot(commands.Bot):
 
                     except Exception as e:
                         reply = f"Failed to process transaction: {e}"
+                elif msg_content.startswith("-"):
+                    reply = f"No Decreasing Credit Allowed {msg.author.display_name}!"
 
                 else:
                     reply = f"Sorry {msg.author.display_name}, you are on the naughty list :("
