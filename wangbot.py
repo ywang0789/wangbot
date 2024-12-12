@@ -225,9 +225,9 @@ class WangBot(commands.Bot):
 
         if msg.channel.id == CHANNEL_ID:
             msg_content = msg.content.strip().lower()
+            reply = None
             if msg_content.startswith("+"):
                 author_id = str(msg.author.id)
-                reply = None
                 if not self._naughty_list.is_user_id_list(author_id):
 
                     try:
@@ -237,9 +237,6 @@ class WangBot(commands.Bot):
 
                     except Exception as e:
                         reply = f"Failed to process transaction: {e}"
-                elif msg_content.startswith("-"):
-                    reply = f"No Decreasing Credit Allowed {msg.author.display_name}!"
-
                 else:
                     reply = f"Sorry {msg.author.display_name}, you are on the naughty list :("
 
@@ -248,3 +245,13 @@ class WangBot(commands.Bot):
                 )
 
                 await msg.channel.send(embed=embed)
+                    
+            elif msg_content.startswith("-"):
+                reply = f"No Decreasing Credit Allowed {msg.author.display_name}!"
+
+                embed = discord.Embed(
+                    title="Social Credit Update", description=reply, color=0xFF0000
+                )
+
+                await msg.channel.send(embed=embed)
+                    
